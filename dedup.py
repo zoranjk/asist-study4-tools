@@ -2,6 +2,7 @@
 import os
 import hashlib
 import shutil
+from tqdm import tqdm
 
 def compute_checksum(file_path, chunk_size=8192):
     """Compute the checksum of a file."""
@@ -19,18 +20,18 @@ def find_unique_files(folder_path):
     file_checksums = {}
     unique_files = []
 
-    total_files = sum(len(files) for _, _, files in os.walk(folder_path))
+    # total_files = sum(len(files) for _, _, files in os.walk(folder_path))
     files_processed = 0
 
     for root, _, files in os.walk(folder_path):
-        for filename in files:
+        for filename in tqdm(files):
             file_path = os.path.join(root, filename)
             checksum = compute_checksum(file_path)
             if checksum not in file_checksums:
                 unique_files.append(file_path)
                 file_checksums[checksum] = file_path
             files_processed += 1
-            print(f"Progress: {files_processed}/{total_files}", end="\r")
+            # print(f"Progress: {files_processed}/{total_files}", end="\r")
     return unique_files
 
 def save_unique_files(folder_path, output_folder):
