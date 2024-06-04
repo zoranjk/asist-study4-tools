@@ -77,7 +77,7 @@ def extract_and_rename_csv_files(source_dir, destination_dir):
                 continue  # Continue to the next file
 
 
-def write_intervention_measures_content_entries(directory_path, output_path):
+def write_intervention_measures_content(directory_path, output_path):
     # Placeholder for content entries and their associated information
     entries = []
 
@@ -118,3 +118,52 @@ def write_intervention_measures_content_entries(directory_path, output_path):
     print(f"Skipped {empty_files} empty files.")
 
     # print(f"Process completed. All content entries with details written to {output_path}")
+
+
+def write_intervention_measures_content_unique(directory_path, output_path):
+
+    # Define the directory path containing the CSV files
+    # directory_path = 'E:\\ASIST Study 4\\Study4_intervention_measures_CSVs'
+
+    # Placeholder for unique content entries and their agents
+    unique_entries = []
+
+    # List all CSV files in the directory
+    csv_files = [f for f in os.listdir(directory_path) if f.endswith('.csv')]
+
+    empty_files = 0
+
+    # Initialize a progress bar
+    for file in tqdm(csv_files):
+        # Construct the full file path
+        file_path = os.path.join(directory_path, file)
+
+        try:
+            # Load the CSV file
+            df = pd.read_csv(file_path)
+
+            # Iterate through each row in the dataframe
+            for _, row in df.iterrows():
+                content = row['Content']
+                agent = row['Agent']
+
+                # Check if the content is not already in the list
+                if not any(entry['Content'] == content for entry in unique_entries):
+                    unique_entries.append({'Content': content, 'Agent': agent})
+        except pd.errors.EmptyDataError:
+            empty_files += 1
+            continue
+            # print(f"Skipping empty or invalid file: {file}")
+
+    # Convert the list of unique entries to a DataFrame
+    unique_df = pd.DataFrame(unique_entries)
+
+    # Define the path for the new CSV file in the desired output folder
+    # output_path = 'C:\\Post-doc Work\\ASIST Study 4\\intervention_measures_unique_content_entries.csv'
+
+    # Write the DataFrame to a new CSV file
+    unique_df.to_csv(output_path, index=False)
+
+    print(f"Skipped {empty_files} empty files.")
+
+    # print(f"Process completed. Unique entries written to {output_path}")
