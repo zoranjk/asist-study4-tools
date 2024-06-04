@@ -10,7 +10,7 @@ def download_file(url, file_name):
         # print(f"Downloaded: {file_name}")
 
 
-def download_dataverse_dataset(persistent_id:str):
+def download_dataverse_dataset(persistent_id, output_path):
     # base_url = "https://dataverse.asu.edu/api/datasets/:persistentId/?persistentId="
     url = f"https://dataverse.asu.edu/api/datasets/:persistentId/?persistentId=doi:10.48349/ASU/{persistent_id}"
 
@@ -21,7 +21,7 @@ def download_dataverse_dataset(persistent_id:str):
 
     dataset = response.json()
     files = dataset["data"]["latestVersion"]["files"]
-    directory = persistent_id
+    directory = output_path
     os.makedirs(directory, exist_ok=True)
 
     for file in tqdm(files):
