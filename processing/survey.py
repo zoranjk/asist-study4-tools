@@ -66,6 +66,35 @@ def extract_and_process_files(source_dir, destination_dir):
             else:
                 print("trial_measures.csv not found.")
 
+def combine_individual_measures(individual_survey_dir_path, output_file_path):
+    # Define the folder containing the CSV files
+    # folder_path = 'E:\\ASIST Study 4\\Study4_IndividualSurveys_CSVs'
+
+    # List all CSV files in the directory
+    csv_files = [file for file in os.listdir(individual_survey_dir_path) if file.endswith('_individual_measures.csv')]
+
+    # Initialize an empty list to store DataFrames
+    dfs = []
+
+    # Loop through the CSV files and append them to the dfs list
+    for file in tqdm(csv_files):
+        file_path = os.path.join(individual_survey_dir_path, file)
+        df = pd.read_csv(file_path)
+        dfs.append(df)
+
+    # Concatenate all DataFrames in the list, retaining all columns
+    combined_df = pd.concat(dfs, axis=0, ignore_index=True, sort=False)
+
+    # Define the path for the output file
+    # output_file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_combined.csv'
+
+    # Save the combined DataFrame to a new CSV file
+    combined_df.to_csv(output_file_path, index=False)
+
+    # print(f'Combined CSV saved to {output_file_path}')
+
+
+
 if __name__ == "__main__":
     source_directory = 'E:\\ASIST Study 4\\DataRawZips-2-8-2024'
     destination_directory = 'E:\\ASIST Study 4\\Study4_IndividualSurveys_CSVs'
