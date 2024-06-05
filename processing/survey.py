@@ -7,6 +7,10 @@ import numpy as np
 from tqdm import tqdm
 
 
+#############################################
+# functions for processing individual surveys
+#############################################
+
 def extract_specific_files(zip_file_path, destination_dir, file_names):
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         # Extract only the specified files if they exist in the zip
@@ -69,7 +73,9 @@ def extract_and_process_files(source_dir, destination_dir):
 
 
 
-
+#############################################
+# functions for combining individual measures
+#############################################
 
 def combine_individual_measures(individual_survey_dir_path, output_file_path):
     # Define the folder containing the CSV files
@@ -99,8 +105,9 @@ def combine_individual_measures(individual_survey_dir_path, output_file_path):
     # print(f'Combined CSV saved to {output_file_path}')
 
 
-
-
+##########################################
+# functions for individual measures unique
+##########################################
 
 def write_individual_measures_unique(individual_measures_combined_file_path, output_file_path):
     # Load the CSV file
@@ -166,8 +173,9 @@ def write_individual_measures_unique(individual_measures_combined_file_path, out
 
 
 
-
-
+#######################################################
+### functions for individual measures calculated unique
+#######################################################
 
 def load_and_rename_columns(file_path):
     # Load the dataset
@@ -357,3 +365,39 @@ def write_individual_measures_calculated_unique(individual_measures_unique_file_
     df.to_csv(output_file_path, index=False)
     # print(f'Individual profiles for unique players dataset saved to {output_file_path}')
 
+
+##########################################################
+# functions for writing individual trial measures combined
+##########################################################
+
+def write_individual_trial_measures_combined(processed_trial_summary_dir_path, output_file_path):
+    # Path to the directory containing CSV files
+    # directory = r'C:\Post-doc Work\ASIST Study 4\Processed_TrialSummary'
+
+    # Output directory and file name
+    # output_directory = r'C:\Post-doc Work\ASIST Study 4'
+    # output_filename = 'Study_4_trial_measures_allIndividualsCombined.csv'
+    # output_path = os.path.join(output_directory, output_filename)
+
+    # List files in the directory
+    files = os.listdir(processed_trial_summary_dir_path)
+
+    # Initialize an empty list to store DataFrames
+    dfs = []
+
+    # Iterate through each file in the directory
+    for file in tqdm(files):
+        if file.endswith('_IndivLevel.csv'):  # Check if file ends with '_IndivLevel.csv'
+            file_path = os.path.join(processed_trial_summary_dir_path, file)
+            # Read the CSV file
+            df = pd.read_csv(file_path)
+            # Append DataFrame to the list
+            dfs.append(df)
+
+    # Concatenate all DataFrames in the list
+    combined_data = pd.concat(dfs, ignore_index=True)
+
+    # Save the combined data to a new CSV file
+    combined_data.to_csv(output_file_path, index=False)
+
+    # print("Individual player trial measures combined data saved to:", output_file_path)
