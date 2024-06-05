@@ -25,6 +25,7 @@ if __name__ == "__main__":
     processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
     individual_surveys_dir_path = os.path.join(data_dir_path, "individual_surveys")
     individual_measures_combined_file_path = os.path.join(data_dir_path, "individual_measures_combined.csv")
+    individual_measures_unique_file_path = os.path.join(data_dir_path, "individual_measures_unique.csv")
 
 
     # print("Downloading dataset...")
@@ -63,6 +64,10 @@ if __name__ == "__main__":
     # survey.extract_and_process_files(download_dir_path,
     #                                  individual_surveys_dir_path)
 
-    print("Combining individual measures...")
-    survey.combine_individual_measures(individual_surveys_dir_path,
-                                       individual_measures_combined_file_path)
+    # print("Combining individual measures...")
+    # survey.combine_individual_measures(individual_surveys_dir_path,
+    #                                    individual_measures_combined_file_path)
+    
+    print("Writing unique individual measures...")
+    survey.write_individual_measures_unique(individual_measures_combined_file_path,
+                                            individual_measures_unique_file_path)

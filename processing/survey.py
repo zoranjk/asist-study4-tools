@@ -94,6 +94,69 @@ def combine_individual_measures(individual_survey_dir_path, output_file_path):
     # print(f'Combined CSV saved to {output_file_path}')
 
 
+def write_individual_measures_unique(individual_measures_combined_file_path, output_file_path):
+    # Load the CSV file
+    # file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_combined.csv'
+    data = pd.read_csv(individual_measures_combined_file_path)
+
+    # Initialize a list to hold the data for the new DataFrame
+    compiled_data = []
+
+    # Iterate over each unique PLAYER_ID to compile its information
+    for player_id in tqdm(data['PLAYER_ID'].unique()):
+        player_data = data[data['PLAYER_ID'] == player_id]
+
+        # Get all trial_ids for this PLAYER_ID
+        unique_trial_ids = player_data['trial_id'].unique()
+
+        # Initialize the info dictionary with necessary information from the first row
+        info = player_data.iloc[0].to_dict()
+
+        # Initialize Number_of_Trials
+        info['Number_of_Trials'] = len(unique_trial_ids)
+
+        # Iterate over each unique trial_id and teamed_with_ids to create dynamic columns
+        for i, trial_id in enumerate(unique_trial_ids, start=1):
+            # Get all unique PLAYER_IDs associated with this trial_id, excluding the current PLAYER_ID
+            teamed_with_ids = data[(data['trial_id'] == trial_id) & (data['PLAYER_ID'] != player_id)]['PLAYER_ID'].unique()
+
+            # Dynamic column names for trial_id and associated PLAYER_IDs
+            trial_column_name = f'associated_trial_id_{i}'
+            teamed_column_name = f'Teamed_With_{i}'
+
+            # Populate info dictionary with trial_id and teamed_with_ids
+            info[trial_column_name] = trial_id
+            info[teamed_column_name] = ', '.join(map(str, teamed_with_ids))
+
+        # Append this compiled info to our list
+        compiled_data.append(info)
+
+    # Convert compiled_data to a DataFrame
+    compiled_df = pd.DataFrame(compiled_data)
+
+    # Rename 'trial_id' column to 'source_trial_id' in the DataFrame
+    if 'trial_id' in compiled_df.columns:
+        compiled_df.rename(columns={'trial_id': 'profile_source_trial_id'}, inplace=True)
+
+    # Columns to be deleted
+    columns_to_delete = [
+        'PRSS-1', 'PRSS-2', 'PRSS-3', 'PRSS-4', 'PRSS-5', 'PRSS-6', 'PRSS-7', 'PRSS-8', 'PRSS-9',
+        'SATIS-1', 'SATIS-2', 'SATIS-3', 'SATIS-4', 'SATIS-5',
+        'SELF_EFF-1', 'SELF_EFF-2', 'SELF_EFF-3', 'SELF_EFF-4', 'SELF_EFF-5', 'SELF_EFF-6', 'SELF_EFF-7', 'SELF_EFF-8',
+        'EVAL-1', 'EVAL-2', 'EVAL-3', 'EVAL-4', 'EVAL-5', 'EVAL-6',
+        'TEAM_FAMIL-1', 'TEAM_FAMIL-2', 'TEAM_FAMIL-3'
+    ]
+
+    # Delete specified columns if they exist in DataFrame to avoid KeyError
+    compiled_df = compiled_df.drop(columns=[col for col in columns_to_delete if col in compiled_df.columns], errors='ignore')
+
+    # Save the compiled DataFrame to a new CSV file
+    # output_file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_UniqueOnly.csv'
+    compiled_df.to_csv(output_file_path, index=False)
+
+    # print(f"Unique player profiles survey measures saved to {output_file_path}")
+
+
 
 if __name__ == "__main__":
     source_directory = 'E:\\ASIST Study 4\\DataRawZips-2-8-2024'
