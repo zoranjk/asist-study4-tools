@@ -1,4 +1,5 @@
 ''' data deduplication functions '''
+
 import os
 import hashlib
 import shutil
@@ -15,12 +16,11 @@ def compute_checksum(file_path, chunk_size=8192):
             hash_algorithm.update(data)
     return hash_algorithm.hexdigest()
 
+
 def find_unique_files(folder_path):
     """Find unique files in the given folder."""
     file_checksums = {}
     unique_files = []
-
-    # total_files = sum(len(files) for _, _, files in os.walk(folder_path))
     files_processed = 0
 
     for root, _, files in os.walk(folder_path):
@@ -31,8 +31,8 @@ def find_unique_files(folder_path):
                 unique_files.append(file_path)
                 file_checksums[checksum] = file_path
             files_processed += 1
-            # print(f"Progress: {files_processed}/{total_files}", end="\r")
     return unique_files
+
 
 def save_unique_files(folder_path, output_folder):
     """Save unique files to the output folder."""
@@ -43,10 +43,4 @@ def save_unique_files(folder_path, output_folder):
         filename = os.path.basename(file_path)
         output_path = os.path.join(output_folder, filename)
         shutil.copyfile(file_path, output_path)
-        # print(f"Saved unique file: {output_path}")
 
-if __name__ == "__main__":
-    input_folder = r"E:\ASIST Study 4\Study4_MetadataFiles"
-    output_folder = r"E:\ASIST Study 4\Study4_MetadataFiles_Unique"
-
-    save_unique_files(input_folder, output_folder)

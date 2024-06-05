@@ -1,3 +1,5 @@
+''' data etl functions '''
+
 import os
 import json
 import csv
@@ -5,10 +7,8 @@ import zipfile
 import pandas as pd
 from tqdm import tqdm
 
-
 def extract_unique_subtypes_with_examples(folder_path):
     files = [f for f in os.listdir(folder_path) if f.endswith('.metadata')]
-    total_files = len(files)  # Total number of files to process
     unique_subtypes = {}  # Use a dictionary to map subtypes to example messages
 
     # Iterate through each file in the specified folder
@@ -28,10 +28,6 @@ def extract_unique_subtypes_with_examples(folder_path):
                 except json.JSONDecodeError:
                     print('json decode error')
                     continue  # Skip invalid JSON lines
-
-        # Print the progress
-        progress_percentage = (file_index / total_files) * 100
-        # print(f"Processed {file_index}/{total_files} files ({progress_percentage:.2f}%)")
 
     return unique_subtypes
 
@@ -56,24 +52,16 @@ def extract_and_rename_csv_files(source_dir, destination_dir):
             folder_name = os.path.splitext(file)[0]
 
             try:
-                # print(f"Processing zip file: {file}")
-
                 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
                     # Extract only 'intervention_measures.csv' if it exists in the zip
                     if 'intervention_measures.csv' in zip_ref.namelist():
                         zip_ref.extract('intervention_measures.csv', destination_dir)
-                        # print(f"Extracted intervention_measures.csv from {file} to {destination_dir}")
-
                         extracted_file = 'intervention_measures.csv'
                         new_file_name = f"{folder_name}_{extracted_file}"
                         os.rename(os.path.join(destination_dir, extracted_file),
                                   os.path.join(destination_dir, new_file_name))
-                        # print(f"Renamed {extracted_file} to {new_file_name}")
-                    else:
-                        pass
-                        # print(f"No 'intervention_measures.csv' found in {file}.")
             except zipfile.BadZipFile as e:
-                # print(f"Failed to process {file} due to a zipfile error: {e}")
+                print(f"Failed to process {file} due to a zipfile error: {e}")
                 continue  # Continue to the next file
 
 
@@ -117,14 +105,8 @@ def write_intervention_measures_content(directory_path, output_path):
 
     print(f"Skipped {empty_files} empty files.")
 
-    # print(f"Process completed. All content entries with details written to {output_path}")
-
 
 def write_intervention_measures_content_unique(directory_path, output_path):
-
-    # Define the directory path containing the CSV files
-    # directory_path = 'E:\\ASIST Study 4\\Study4_intervention_measures_CSVs'
-
     # Placeholder for unique content entries and their agents
     unique_entries = []
 
@@ -153,17 +135,13 @@ def write_intervention_measures_content_unique(directory_path, output_path):
         except pd.errors.EmptyDataError:
             empty_files += 1
             continue
-            # print(f"Skipping empty or invalid file: {file}")
 
     # Convert the list of unique entries to a DataFrame
     unique_df = pd.DataFrame(unique_entries)
-
-    # Define the path for the new CSV file in the desired output folder
-    # output_path = 'C:\\Post-doc Work\\ASIST Study 4\\intervention_measures_unique_content_entries.csv'
 
     # Write the DataFrame to a new CSV file
     unique_df.to_csv(output_path, index=False)
 
     print(f"Skipped {empty_files} empty files.")
 
-    # print(f"Process completed. Unique entries written to {output_path}")
+    

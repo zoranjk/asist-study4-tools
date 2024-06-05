@@ -1,3 +1,5 @@
+''' metadata processing functions '''
+
 import json
 import pandas as pd
 from pathlib import Path
@@ -23,6 +25,7 @@ def extract_bomb_summary_player_data(bomb_summary_player):
             detailed_data.append(extracted_data)
     return detailed_data
 
+
 def extract_individual_data(data, members, trial_id):
     indiv_data = []
     player_fields = ["TeammatesRescued", "TimesFrozen", "TextChatsSent", "FlagsPlaced",
@@ -37,6 +40,7 @@ def extract_individual_data(data, members, trial_id):
             member_data[field] = field_data.get(member, 0) if isinstance(field_data, dict) else 0
         indiv_data.append(member_data)
     return indiv_data
+
 
 def extract_trial_summary_data(json_obj):
     team_data = {}
@@ -76,17 +80,13 @@ def extract_trial_summary_data(json_obj):
 
     return team_data, indiv_data
 
+
 def process_metadata_files(metadata_dir_path, output_folder_path):
-    # output_folder_path = Path('C:/Post-doc Work/ASIST Study 4/Processed_TrialSummary')  # Explicitly set the absolute path
     output_folder_path = Path(output_folder_path)
     output_folder_path.mkdir(parents=True, exist_ok=True)
-    # print(f"Output folder path: {output_folder_path}")  # Debug print statement
-
     metadata_files = list(Path(metadata_dir_path).glob('*.metadata'))
-    # print(f"Found {len(metadata_files)} metadata files.")  # Debug print statement
 
     for i, file_path in enumerate(tqdm(metadata_files), start=1):
-        # print(f"Processing file {i}/{len(metadata_files)}: {file_path.name}")
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file:
                 content = json.loads(line)
@@ -102,12 +102,5 @@ def process_metadata_files(metadata_dir_path, output_folder_path):
                     team_df.to_csv(team_csv_path, index=False)
                     indiv_df.to_csv(indiv_csv_path, index=False)
 
-                    # print(f"Data extracted and saved to {team_csv_path} and {indiv_csv_path}")  # Debug print statement
-
                     break  # Stop after processing the first TrialSummary message
 
-    # print("All files processed.")
-
-if __name__ == "__main__":
-    folder_path = 'E:\ASIST Study 4\Study4_MetadataFiles'
-    process_metadata_files(folder_path)

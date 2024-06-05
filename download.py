@@ -1,3 +1,5 @@
+''' data download functions '''
+
 import os
 import requests
 from tqdm import tqdm
@@ -7,11 +9,9 @@ def download_file(url, file_name):
     response = requests.get(url)
     with open(file_name, "wb") as file:
         file.write(response.content)
-        # print(f"Downloaded: {file_name}")
 
 
 def download_dataverse_dataset(persistent_id, output_path):
-    # base_url = "https://dataverse.asu.edu/api/datasets/:persistentId/?persistentId="
     url = f"https://dataverse.asu.edu/api/datasets/:persistentId/?persistentId=doi:10.48349/ASU/{persistent_id}"
 
     response = requests.get(url)
@@ -30,10 +30,5 @@ def download_dataverse_dataset(persistent_id, output_path):
         download_url = f"https://dataverse.asu.edu/api/access/datafile/{file_id}?persistentId=doi:10.48349/ASU/{persistent_id}"
         download_path = os.path.join(directory, file_name)
         download_file(download_url, download_path)
-        # print("For loop activated")
-        # print(file_name)
 
-
-if __name__ == "__main__":
-    download_dataverse_dataset()
-    print("Download completed")
+        

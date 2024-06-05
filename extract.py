@@ -1,8 +1,8 @@
 ''' module for extracting zipped folder contents '''
+
 import os
 import zipfile
 from tqdm import tqdm
-
 
 def extract_metadata(zip_folder_path, output_path):
     os.makedirs(output_path, exist_ok=True)
