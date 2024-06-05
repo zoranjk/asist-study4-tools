@@ -26,7 +26,7 @@ if __name__ == "__main__":
     individual_surveys_dir_path = os.path.join(data_dir_path, "individual_surveys")
     individual_measures_combined_file_path = os.path.join(data_dir_path, "individual_measures_combined.csv")
     individual_measures_unique_file_path = os.path.join(data_dir_path, "individual_measures_unique.csv")
-
+    individual_measures_calculated_unique_file_path = os.path.join(data_dir_path, "individual_measures_calculated_unique.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -68,6 +68,10 @@ if __name__ == "__main__":
     # survey.combine_individual_measures(individual_surveys_dir_path,
     #                                    individual_measures_combined_file_path)
     
-    print("Writing unique individual measures...")
-    survey.write_individual_measures_unique(individual_measures_combined_file_path,
-                                            individual_measures_unique_file_path)
+    # print("Writing unique individual measures...")
+    # survey.write_individual_measures_unique(individual_measures_combined_file_path,
+    #                                         individual_measures_unique_file_path)
+
+    print("Writing unique calculated individual measures...")
+    survey.write_individual_measures_calculated_unique(individual_measures_combined_file_path,
+                                                       individual_measures_calculated_unique_file_path)
