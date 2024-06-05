@@ -2,7 +2,7 @@ import download
 import extract
 import dedup
 import etl
-from processing import metadata
+from processing import metadata, survey
 
 import json
 import os
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     intervention_measures_file_path = os.path.join(data_dir_path, "intervention_measures.csv")
     intervention_measures_unique_file_path = os.path.join(data_dir_path, "intervention_measures_unique.csv")
     processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
+    individual_surveys_dir_path = os.path.join(data_dir_path, "individual_surveys")
 
 
     # print("Downloading dataset...")
@@ -53,8 +54,12 @@ if __name__ == "__main__":
     # etl.write_intervention_measures_content_unique(intervention_measures_dir_path,
     #                                                intervention_measures_unique_file_path)
     
-    print("Processing metadata files...")
-    metadata.process_metadata_files(metadata_dir_path,
-                                    processed_trial_summary_dir_path)
+    # print("Processing metadata files...")
+    # metadata.process_metadata_files(metadata_dir_path,
+    #                                 processed_trial_summary_dir_path)
+
+    print("Processing individual surveys...")
+    survey.extract_and_process_files(download_dir_path,
+                                     individual_surveys_dir_path)
 
    
