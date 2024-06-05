@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-
 #############################################
 # functions for processing individual surveys
 #############################################
@@ -44,17 +43,13 @@ def process_individual_measures(trial_id, individual_measures_path, destination_
         df.insert(0, 'trial_id', trial_id)
         output_file_name = f"{trial_id}_individual_measures.csv"
         df.to_csv(os.path.join(destination_dir, output_file_name), index=False)
-        # print(f"Processed and saved {output_file_name}")
 
 
 def extract_and_process_files(source_dir, destination_dir):
-    # if not os.path.exists(destination_dir):
     os.makedirs(destination_dir, exist_ok=True)
-    # print(f"Created destination directory: {destination_dir}")
 
     for file in tqdm(os.listdir(source_dir)):
         if file.endswith('.zip'):
-            # print(f"Processing zip file: {file}")
             zip_file_path = os.path.join(source_dir, file)
             extracted_files = extract_specific_files(zip_file_path, destination_dir,
                                                      ['trial_measures.csv', 'individual_measures.csv'])
@@ -72,15 +67,11 @@ def extract_and_process_files(source_dir, destination_dir):
                 print("trial_measures.csv not found.")
 
 
-
 #############################################
 # functions for combining individual measures
 #############################################
 
 def combine_individual_measures(individual_survey_dir_path, output_file_path):
-    # Define the folder containing the CSV files
-    # folder_path = 'E:\\ASIST Study 4\\Study4_IndividualSurveys_CSVs'
-
     # List all CSV files in the directory
     csv_files = [file for file in os.listdir(individual_survey_dir_path) if file.endswith('_individual_measures.csv')]
 
@@ -96,13 +87,8 @@ def combine_individual_measures(individual_survey_dir_path, output_file_path):
     # Concatenate all DataFrames in the list, retaining all columns
     combined_df = pd.concat(dfs, axis=0, ignore_index=True, sort=False)
 
-    # Define the path for the output file
-    # output_file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_combined.csv'
-
     # Save the combined DataFrame to a new CSV file
     combined_df.to_csv(output_file_path, index=False)
-
-    # print(f'Combined CSV saved to {output_file_path}')
 
 
 ##########################################
@@ -110,8 +96,6 @@ def combine_individual_measures(individual_survey_dir_path, output_file_path):
 ##########################################
 
 def write_individual_measures_unique(individual_measures_combined_file_path, output_file_path):
-    # Load the CSV file
-    # file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_combined.csv'
     data = pd.read_csv(individual_measures_combined_file_path)
 
     # Initialize a list to hold the data for the new DataFrame
@@ -166,11 +150,7 @@ def write_individual_measures_unique(individual_measures_combined_file_path, out
     compiled_df = compiled_df.drop(columns=[col for col in columns_to_delete if col in compiled_df.columns], errors='ignore')
 
     # Save the compiled DataFrame to a new CSV file
-    # output_file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_UniqueOnly.csv'
     compiled_df.to_csv(output_file_path, index=False)
-
-    # print(f"Unique player profiles survey measures saved to {output_file_path}")
-
 
 
 #######################################################
@@ -249,7 +229,6 @@ def calculate_spatial_ability_avg(df):
     df['SpatialAbility_avg'] = df.apply(spatial_ability_score, axis=1)
 
     return df
-
 
 
 def calculate_mc_prof_avg(df):
@@ -333,9 +312,6 @@ def track_individual_missing_data(df, columns):
 
 
 def write_individual_measures_calculated_unique(individual_measures_unique_file_path, output_file_path):
-    # file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_UniqueOnly.csv'
-    # output_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_calculated_UniqueOnly.csv'
-
     # Load the dataset and rename columns
     df = load_and_rename_columns(individual_measures_unique_file_path)
 
@@ -363,7 +339,6 @@ def write_individual_measures_calculated_unique(individual_measures_unique_file_
 
     # Save the modified DataFrame to a new CSV file
     df.to_csv(output_file_path, index=False)
-    # print(f'Individual profiles for unique players dataset saved to {output_file_path}')
 
 
 ##########################################################
@@ -371,14 +346,6 @@ def write_individual_measures_calculated_unique(individual_measures_unique_file_
 ##########################################################
 
 def write_individual_trial_measures_combined(processed_trial_summary_dir_path, output_file_path):
-    # Path to the directory containing CSV files
-    # directory = r'C:\Post-doc Work\ASIST Study 4\Processed_TrialSummary'
-
-    # Output directory and file name
-    # output_directory = r'C:\Post-doc Work\ASIST Study 4'
-    # output_filename = 'Study_4_trial_measures_allIndividualsCombined.csv'
-    # output_path = os.path.join(output_directory, output_filename)
-
     # List files in the directory
     files = os.listdir(processed_trial_summary_dir_path)
 
@@ -400,4 +367,4 @@ def write_individual_trial_measures_combined(processed_trial_summary_dir_path, o
     # Save the combined data to a new CSV file
     combined_data.to_csv(output_file_path, index=False)
 
-    # print("Individual player trial measures combined data saved to:", output_file_path)
+    
