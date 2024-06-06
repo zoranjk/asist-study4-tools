@@ -367,4 +367,51 @@ def write_individual_trial_measures_combined(processed_trial_summary_dir_path, o
     # Save the combined data to a new CSV file
     combined_data.to_csv(output_file_path, index=False)
 
-    
+#####################
+#
+#####################
+
+def write_individual_player_profile_trial_measures_combined(individual_measures_calculated_unique_file_path,
+                                                            individual_trial_measures_combined_file_path,
+                                                            individual_measures_combined_file_path,
+                                                            output_path):
+    # Read the CSV files
+    individual_measures_df = pd.read_csv(individual_measures_calculated_unique_file_path)
+    trial_measures_df = pd.read_csv(individual_trial_measures_combined_file_path)
+    additional_data_df = pd.read_csv(individual_measures_combined_file_path)
+
+    # Merge the data frames - Assuming this is correct and required
+    common_columns = trial_measures_df.columns.intersection(individual_measures_df.columns).tolist()
+    combined_df = pd.merge(trial_measures_df,
+                           individual_measures_df,
+                           left_on=['participant_ID'] + common_columns,
+                           right_on=['PLAYER_ID'] + common_columns,
+                           how='left')
+    # NOTE: Added common_columns to left_on and right_on arguments,
+    #       otherwise pandas appends _x and _y suffixes instead of combining
+    #       common column names, causing the later merge to fail on a
+    #       KeyError for 'trial_id'. Maybe this was a version change in pandas?
+    #       Below is the original function call.
+    # combined_df = pd.merge(trial_measures_df, individual_measures_df, left_on='participant_ID', right_on='PLAYER_ID', how='left')
+
+    # Columns to integrate from the additional data
+    columns_to_integrate = [
+        'PRSS-1', 'PRSS-2', 'PRSS-3', 'PRSS-4', 'PRSS-5', 'PRSS-6', 'PRSS-7', 'PRSS-8', 'PRSS-9',
+        'SATIS-1', 'SATIS-2', 'SATIS-3', 'SATIS-4', 'SATIS-5',
+        'SELF_EFF-1', 'SELF_EFF-2', 'SELF_EFF-3', 'SELF_EFF-4', 'SELF_EFF-5', 'SELF_EFF-6', 'SELF_EFF-7', 'SELF_EFF-8',
+        'EVAL-1', 'EVAL-2', 'EVAL-3', 'EVAL-4', 'EVAL-5', 'EVAL-6',
+        'TEAM_FAMIL-1', 'TEAM_FAMIL-2', 'TEAM_FAMIL-3'
+    ]
+
+    # Ensure only relevant columns are selected from the additional data
+    additional_data_df_selected = additional_data_df[['trial_id', 'PLAYER_ID'] + columns_to_integrate]
+
+    # Correctly define 'combined_df' if not already done or if it needs adjustment
+    # Ensure your 'trial_measures_df' has a 'trial_id' column for this merge to work
+    # This line assumes that your initial merge was correct and 'combined_df' is ready for further merging
+    combined_df = pd.merge(combined_df, additional_data_df_selected, on=['trial_id', 'PLAYER_ID'], how='left')
+
+    # Save the combined data to a new CSV file
+    combined_df.to_csv(output_path, index=False)
+
+    # print(f"Combined file saved to {output_path}")
