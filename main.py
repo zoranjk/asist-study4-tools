@@ -87,3 +87,6 @@ if __name__ == "__main__":
                                                                    individual_trial_measures_combined_file_path,
                                                                    individual_measures_combined_file_path,
                                                                    individual_player_profiles_trial_measures_combined_file_path)
+    
+    print("Doing in-place post-hoc calculations on combined individual player profile trial measures...")
+    survey.post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path)

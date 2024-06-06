@@ -367,9 +367,9 @@ def write_individual_trial_measures_combined(processed_trial_summary_dir_path, o
     # Save the combined data to a new CSV file
     combined_data.to_csv(output_file_path, index=False)
 
-#####################
-#
-#####################
+#########################################################################
+# functions for writing individual player profile trial measures combined
+#########################################################################
 
 def write_individual_player_profile_trial_measures_combined(individual_measures_calculated_unique_file_path,
                                                             individual_trial_measures_combined_file_path,
@@ -386,7 +386,13 @@ def write_individual_player_profile_trial_measures_combined(individual_measures_
                            individual_measures_df,
                            left_on=['participant_ID'] + common_columns,
                            right_on=['PLAYER_ID'] + common_columns,
-                           how='left')
+                           how='left',
+                           suffixes=(None, '_drop'))
+    duplicate_columns = [col for col in combined_df.columns if col.endswith('_drop')]
+    # print(duplicate_columns)
+    # combined_df.drop(duplicate_columns)
+    # for col in combined_df.columns:
+    #     print(col)
     # NOTE: Added common_columns to left_on and right_on arguments,
     #       otherwise pandas appends _x and _y suffixes instead of combining
     #       common column names, causing the later merge to fail on a
@@ -409,9 +415,53 @@ def write_individual_player_profile_trial_measures_combined(individual_measures_
     # Correctly define 'combined_df' if not already done or if it needs adjustment
     # Ensure your 'trial_measures_df' has a 'trial_id' column for this merge to work
     # This line assumes that your initial merge was correct and 'combined_df' is ready for further merging
-    combined_df = pd.merge(combined_df, additional_data_df_selected, on=['trial_id', 'PLAYER_ID'], how='left')
+    common_columns = combined_df.columns.intersection(additional_data_df_selected.columns).tolist()
+    # NOTE: Added common_columns to merge, see explanation at previous merge above.
+    combined_df = pd.merge(combined_df, additional_data_df_selected, on=['trial_id', 'PLAYER_ID'] + common_columns, how='left')
 
     # Save the combined data to a new CSV file
     combined_df.to_csv(output_path, index=False)
 
-    # print(f"Combined file saved to {output_path}")
+
+#####################################
+# functions for post-hoc calculations
+#####################################
+
+def post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path):
+    # Load the dataset
+    df = pd.read_csv(individual_player_profiles_trial_measures_combined_file_path)
+
+    # Renaming columns
+    rename_columns = {
+        'SATIS-1': 'SATIS_score',
+        'SATIS-2': 'SATIS_workedTogether',
+        'SATIS-3': 'SATIS_teamPlan',
+        'SATIS-4': 'SATIS_teamAgain',
+        'SATIS-5': 'SATIS_teamCapable',
+        'SELF_EFF-1': 'EFF_workEthic',
+        'SELF_EFF-2': 'EFF_overcomeProblems',
+        'SELF_EFF-3': 'EFF_planStrategy',
+        'SELF_EFF-4': 'EFF_maintainPositivity',
+        'SELF_EFF-5': 'EFF_disposeBombs',
+        'SELF_EFF-6': 'EFF_speedRun',
+        'SELF_EFF-7': 'EFF_knowledgeCoord',
+        'SELF_EFF-8': 'EFF_roleCoord',
+        'EVAL-1': 'advisorEVAL_improvedScore',
+        'EVAL-2': 'AdvisorEVAL_improvedCoord',
+        'EVAL-3': 'advisorEVAL_comfortDependingOn',
+        'EVAL-4': 'advisorEVAL_understoodRecommends',
+        'EVAL-5': 'advisorEVAL_wasTrustworthy',
+        'EVAL-6': 'advisorEVAL_elaborate'
+    }
+
+    df.rename(columns=rename_columns, inplace=True)
+
+    # Calculate the averages for the specified PRSS columns
+    df['PRSS_transition'] = df[['PRSS-1', 'PRSS-2', 'PRSS-3']].mean(axis=1)
+    df['PRSS_action'] = df[['PRSS-4', 'PRSS-5', 'PRSS-6']].mean(axis=1)
+    df['PRSS_interpersonal'] = df[['PRSS-7', 'PRSS-8', 'PRSS-9']].mean(axis=1)
+    df['PRSS_avg'] = df[['PRSS-1', 'PRSS-2', 'PRSS-3', 'PRSS-4', 'PRSS-5', 'PRSS-6', 'PRSS-7', 'PRSS-8', 'PRSS-9']].mean(axis=1)
+
+    # Save the updated DataFrame back to the same CSV file
+    df.to_csv(individual_player_profiles_trial_measures_combined_file_path, index=False)
+
