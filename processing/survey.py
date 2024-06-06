@@ -5,6 +5,8 @@ import zipfile
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+from scipy.spatial.distance import pdist, squareform
+from scipy.linalg import svd
 
 #############################################
 # functions for processing individual surveys
@@ -388,11 +390,6 @@ def write_individual_player_profile_trial_measures_combined(individual_measures_
                            right_on=['PLAYER_ID'] + common_columns,
                            how='left',
                            suffixes=(None, '_drop'))
-    duplicate_columns = [col for col in combined_df.columns if col.endswith('_drop')]
-    # print(duplicate_columns)
-    # combined_df.drop(duplicate_columns)
-    # for col in combined_df.columns:
-    #     print(col)
     # NOTE: Added common_columns to left_on and right_on arguments,
     #       otherwise pandas appends _x and _y suffixes instead of combining
     #       common column names, causing the later merge to fail on a
@@ -465,3 +462,138 @@ def post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_p
     # Save the updated DataFrame back to the same CSV file
     df.to_csv(individual_player_profiles_trial_measures_combined_file_path, index=False)
 
+
+##################################################################
+# functions for combining individual player profile trial measures
+##################################################################
+
+def read_csv(file_path):
+    return pd.read_csv(file_path)
+
+
+def preprocess_df(df):
+    # Calculating new columns based on existing ones according to provided rules
+    df['PsychCollect_avg_percent'] = (df['PsychCollect_avg'] / 5) * 100
+    df['SociableDom_avg_percent'] = (df['SociableDom_avg'] / 5) * 100
+    df['ReadingMind_score_percent'] = df['ReadingMind_score'] * 10
+    df['SpatialAbility_avg_percent'] = (df['SpatialAbility_avg'] / 7) * 100
+    df['MCProf_avg_percent'] = df['MCProf_avg']  # Assuming this is already in the desired format
+    return df
+
+
+def geometric_alignment(attributes):
+    # Calculate all pairwise distances
+    distances = squareform(pdist(attributes, 'euclidean'))
+    # Set the diagonal to np.nan to exclude self-comparisons
+    np.fill_diagonal(distances, np.nan)
+    # Check for a valid number of non-NaN elements before calculating mean
+    if np.isfinite(distances).sum() > 0:
+        mean_square_distance = np.nanmean(distances ** 2)
+    else:
+        mean_square_distance = np.nan  # Or some other placeholder for invalid/missing data
+    return mean_square_distance
+
+
+def physical_alignment(attributes):
+    # Calculate all pairwise distances
+    distances = squareform(pdist(attributes, 'euclidean'))
+    # Set the diagonal to np.nan to avoid division by zero in self-comparisons
+    np.fill_diagonal(distances, np.nan)
+    # Avoid division by very small distances; set a threshold for "effectively zero"
+    threshold = 1e-10  # Adjust this threshold as necessary
+    distances[distances < threshold] = np.nan  # Treat as "effectively infinite" distance to avoid divide by zero
+    # Sum the reciprocal of the distances, now safely excluding near-zero distances
+    potential_energy_score = np.nansum(1 / distances)
+    return potential_energy_score
+
+
+def centroid_physical_alignment(attributes):
+    # Calculate the centroid of the given attributes
+    centroid = np.mean(attributes, axis=0)
+    # Calculate the distances from each point to the centroid
+    distances = np.linalg.norm(attributes - centroid, axis=1)
+    # Check that there are more than one unique point
+    if len(np.unique(attributes, axis=0)) > 1:
+        # Set zero distances to a small number to avoid division by zero
+        distances[distances == 0] = np.finfo(float).eps
+        # Calculate the potential energy score relative to the centroid
+        potential_energy_score = np.sum(1 / distances)
+    else:
+        potential_energy_score = np.nan  # Or some other placeholder for invalid/missing data
+    return potential_energy_score
+
+
+def algebraic_alignment(attributes):
+    U, s, V = svd(attributes, full_matrices=False)
+    alignment_strength = np.sum(s)
+    return alignment_strength
+
+
+def calculate_alignment(df, attribute_columns, grouping_variable):
+    # Ensure no infinite values and fill NaNs, for example, with zeros or mean of the column
+    df_cleaned = df.replace([np.inf, -np.inf], np.nan).dropna(subset=attribute_columns)
+    # df_cleaned = df.replace([np.inf, -np.inf], np.nan).fillna(0) # Alternative: Replace NaNs with 0
+
+    # Initialize a DataFrame to store the results
+    results = []
+
+    # Iterate over unique groups (teams)
+    for trial_id in df_cleaned[grouping_variable].unique():
+        team_data = df_cleaned[df_cleaned[grouping_variable] == trial_id][attribute_columns].values
+
+        # Check for any remaining NaN or Inf values
+        if np.isnan(team_data).any() or np.isinf(team_data).any():
+            print(f"Skipping trial_id {trial_id} due to NaN or Inf values in team data.")
+            continue
+
+        # Calculate each type of alignment
+        geom_align = geometric_alignment(team_data)
+        phys_align = physical_alignment(team_data)
+        alg_align = algebraic_alignment(team_data)
+        cent_phys_align = centroid_physical_alignment(team_data)
+
+        # Store results
+        results.append({
+            'trial_id': trial_id,
+            'geometric_alignment': geom_align,
+            'physical_alignment': phys_align,
+            'algebraic_alignment': alg_align,
+            'centroid_physical_alignment': cent_phys_align
+        })
+
+    # Convert results to a DataFrame
+    results_df = pd.DataFrame(results)
+    return results_df
+
+
+def align_individual_player_profiles_trial_measures_combined(file_path, grouping_variable='trial_id'):
+    df = read_csv(file_path)
+    df = preprocess_df(df)
+    # Define attribute sets
+    attribute_sets = [
+        ['PsychCollect_avg_percent', 'SociableDom_avg_percent', 'ReadingMind_score_percent', 'SpatialAbility_avg_percent', 'MCProf_avg_percent'],
+        ['PsychCollect_avg_percent', 'SociableDom_avg_percent', 'ReadingMind_score_percent'],
+        ['SpatialAbility_avg_percent', 'MCProf_avg_percent']
+    ]
+
+    attribute_set_names = ['allAttributes', 'teamworkAttributes', 'taskworkAttributes']  # Unique names for each attribute set
+
+    # Initialize an empty DataFrame to store all results
+    all_results_df = pd.DataFrame()
+
+    for attribute_columns, set_name in zip(tqdm(attribute_sets), attribute_set_names):
+        # Calculate alignment for each attribute set
+        results_df = calculate_alignment(df, attribute_columns, grouping_variable)
+
+        # Rename the columns with the set name as a suffix
+        results_df = results_df.rename(columns=lambda x: f"{x}_{set_name}" if x != 'trial_id' else x)
+
+        if all_results_df.empty:
+            all_results_df = results_df
+        else:
+            # Merge the new results into the all_results DataFrame
+            all_results_df = pd.merge(all_results_df, results_df, on='trial_id', how='outer')
+
+    # Save to CSV
+    all_results_df.to_csv(file_path, index=False)
+    # print("All results saved to Study_4_teams_alignment_results_combined.csv")
