@@ -1,8 +1,4 @@
-import download
-import extract
-import dedup
-import etl
-from processing import metadata, survey, team
+from processing import download, extract, dedup, etl, metadata, survey, team
 
 import json
 import os
