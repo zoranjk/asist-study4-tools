@@ -107,8 +107,11 @@ if __name__ == "__main__":
     # team.calculate_trial_level_team_profiles(individual_player_profiles_trial_measures_combined_file_path,
     #                                          trial_level_team_profiles_file_path)
     
-    print("Writing combined team player profiles trial measures...")
-    team.write_team_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
-                                                            trial_level_team_profiles_file_path,
-                                                            teams_alignment_results_combined_file_path,
-                                                            team_player_profiles_trial_measures_combined_file_path)
+    # print("Writing combined team player profiles trial measures...")
+    # team.write_team_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+    #                                                         trial_level_team_profiles_file_path,
+    #                                                         teams_alignment_results_combined_file_path,
+    #                                                         team_player_profiles_trial_measures_combined_file_path)
+    
+    print("Identifying repeat teams in combined team player profiles trial measures...")
+    team.identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path)

@@ -226,20 +226,14 @@ def calculate_trial_level_team_profiles(individual_player_profiles_trial_measure
     # print(f'Team profiles saved to {output_file_path}')
 
 
-#
-#
-#
+#################################################################
+# functions to write team player profiles trial measures combined
+#################################################################
 
 def write_team_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
                                                        trial_level_team_profiles_file_path,
                                                        teams_alignment_results_combined_file_path,
                                                        output_file_path):
-    # Define the file paths
-    # trial_measures_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_trial_measures_TeamCombined.csv'
-    # trial_level_profiles_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_trialLevel_TeamProfiles.csv'
-    # teams_alignment_results_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_teams_alignment_results_combined.csv'
-    # output_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_team_playerProfiles_trialMeasures_Combined.csv'
-
     # Read in the files
     trial_measures = pd.read_csv(trial_measures_team_combined_file_path)
     trial_level_profiles = pd.read_csv(trial_level_team_profiles_file_path)
@@ -258,3 +252,50 @@ def write_team_player_profiles_trial_measures_combined(trial_measures_team_combi
     final_combined_data.to_csv(output_file_path, index=False)
 
     # print('Team profiles, trial summary data, and team alignment results have been successfully combined and saved to', output_file_path)
+
+
+####################################
+# functions to identify repeat teams
+####################################
+
+def identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path):
+
+    # Step 1: Read the CSV File
+    # file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_team_playerProfiles_trialMeasures_Combined.csv'
+    df = pd.read_csv(team_player_profiles_trial_measures_combined_file_path)
+
+    # Ensure 'Team_Members' is processed correctly (assuming it's a string representation of a list)
+    import ast
+    df['Team_Members'] = df['Team_Members'].apply(ast.literal_eval)
+
+    # Step 2: Process Team Members - sort IDs within each list to ensure consistency
+    df['Sorted_Team_Members'] = df['Team_Members'].apply(lambda x: sorted(x))
+
+    # Step 3: Order Chronologically
+    df = df.sort_values(by='StartTimestamp')
+
+    # Step 4: Count Team Combinations
+    # Initialize a dictionary to keep track of team combination counts
+    team_counts = {}
+    # List to store the count for each row
+    counts = []
+
+    for team in df['Sorted_Team_Members']:
+        # Convert team list to a tuple so it can be used as a dictionary key
+        team_tuple = tuple(team)
+        # If the team combination has been seen, increment the count, otherwise start at 1
+        if team_tuple in team_counts:
+            team_counts[team_tuple] += 1
+        else:
+            team_counts[team_tuple] = 1
+        # Append the current count for this team combination to the counts list
+        counts.append(team_counts[team_tuple])
+
+    # Step 5: Add New Column with Counts
+    df['Team_Combination_Count'] = counts
+
+    # Step 6: Save the Modified DataFrame
+    # output_file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_team_playerProfiles_trialMeasures_Combined.csv'
+    df.to_csv(team_player_profiles_trial_measures_combined_file_path, index=False)
+
+    # print(f"Modified file saved to {output_file_path}")
