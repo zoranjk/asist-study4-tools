@@ -2,7 +2,7 @@ import download
 import extract
 import dedup
 import etl
-from processing import metadata, survey
+from processing import metadata, survey, team
 
 import json
 import os
@@ -29,6 +29,7 @@ if __name__ == "__main__":
     individual_measures_calculated_unique_file_path = os.path.join(data_dir_path, "individual_measures_calculated_unique.csv")
     individual_trial_measures_combined_file_path = os.path.join(data_dir_path, "individual_trial_measures_combined.csv")
     individual_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "individual_player_profiles_trial_measures_combined.csv")
+    trial_measures_team_combined_file_path = os.path.join(data_dir_path, "trial_measures_team_combined.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -82,14 +83,18 @@ if __name__ == "__main__":
     # survey.write_individual_trial_measures_combined(processed_trial_summary_dir_path,
     #                                                 individual_trial_measures_combined_file_path)
 
-    print("Writing combined individual player profile trial measures...")
-    survey.write_individual_player_profile_trial_measures_combined(individual_measures_calculated_unique_file_path,
-                                                                   individual_trial_measures_combined_file_path,
-                                                                   individual_measures_combined_file_path,
-                                                                   individual_player_profiles_trial_measures_combined_file_path)
+    # print("Writing combined individual player profile trial measures...")
+    # survey.write_individual_player_profile_trial_measures_combined(individual_measures_calculated_unique_file_path,
+    #                                                                individual_trial_measures_combined_file_path,
+    #                                                                individual_measures_combined_file_path,
+    #                                                                individual_player_profiles_trial_measures_combined_file_path)
     
-    print("Doing in-place post-hoc calculations on combined individual player profile trial measures...")
-    survey.post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path)
+    # print("Doing in-place post-hoc calculations on combined individual player profile trial measures...")
+    # survey.post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path)
 
-    print("Doing in-place alignment on combined individual player profiles trial measures...")
-    survey.align_individual_player_profiles_trial_measures_combined(individual_player_profiles_trial_measures_combined_file_path)
+    # print("Doing in-place alignment on combined individual player profiles trial measures...")
+    # survey.align_individual_player_profiles_trial_measures_combined(individual_player_profiles_trial_measures_combined_file_path)
+
+    print("Collating team trial measures...")
+    team.collate_team_trial_measures(processed_trial_summary_dir_path,
+                                     trial_measures_team_combined_file_path)
