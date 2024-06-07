@@ -29,7 +29,9 @@ if __name__ == "__main__":
     individual_measures_calculated_unique_file_path = os.path.join(data_dir_path, "individual_measures_calculated_unique.csv")
     individual_trial_measures_combined_file_path = os.path.join(data_dir_path, "individual_trial_measures_combined.csv")
     individual_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "individual_player_profiles_trial_measures_combined.csv")
+    teams_alignment_results_combined_file_path = os.path.join(data_dir_path, "teams_alignment_results_combined.csv")
     trial_measures_team_combined_file_path = os.path.join(data_dir_path, "trial_measures_team_combined.csv")
+    trial_level_team_profiles_file_path = os.path.join(data_dir_path, "trial_level_team_profiles.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -75,8 +77,8 @@ if __name__ == "__main__":
     # survey.write_individual_measures_unique(individual_measures_combined_file_path,
     #                                         individual_measures_unique_file_path)
 
-    # print("Writing unique calculated individual measures...")
-    # survey.write_individual_measures_calculated_unique(individual_measures_combined_file_path,
+    # print("Writing calculated unique individual measures...")
+    # survey.write_individual_measures_calculated_unique(individual_measures_unique_file_path,
     #                                                    individual_measures_calculated_unique_file_path)
 
     # print("Writing combined individual trial measures...")
@@ -92,9 +94,14 @@ if __name__ == "__main__":
     # print("Doing in-place post-hoc calculations on combined individual player profile trial measures...")
     # survey.post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path)
 
-    # print("Doing in-place alignment on combined individual player profiles trial measures...")
-    # survey.align_individual_player_profiles_trial_measures_combined(individual_player_profiles_trial_measures_combined_file_path)
+    # print("Writing combined team alignment results...")
+    # survey.align_individual_player_profiles_trial_measures_combined(individual_player_profiles_trial_measures_combined_file_path,
+    #                                                                 teams_alignment_results_combined_file_path)
 
-    print("Collating team trial measures...")
-    team.collate_team_trial_measures(processed_trial_summary_dir_path,
-                                     trial_measures_team_combined_file_path)
+    # print("Collating team trial measures...")
+    # team.collate_team_trial_measures(processed_trial_summary_dir_path,
+    #                                  trial_measures_team_combined_file_path)
+    
+    print("Calculating trial level team profiles...")
+    team.calculate_trial_level_team_profiles(individual_player_profiles_trial_measures_combined_file_path,
+                                             trial_level_team_profiles_file_path)

@@ -373,6 +373,13 @@ def write_individual_trial_measures_combined(processed_trial_summary_dir_path, o
 # functions for writing individual player profile trial measures combined
 #########################################################################
 
+# individual_measures_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_calculated_UniqueOnly.csv'
+# trial_measures_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_trial_measures_allIndividualsCombined.csv'
+# additional_data_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_measures_combined.csv'
+# output_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_playerProfiles_trialMeasures_Combined.csv'
+
+
+
 def write_individual_player_profile_trial_measures_combined(individual_measures_calculated_unique_file_path,
                                                             individual_trial_measures_combined_file_path,
                                                             individual_measures_combined_file_path,
@@ -566,7 +573,7 @@ def calculate_alignment(df, attribute_columns, grouping_variable):
     return results_df
 
 
-def align_individual_player_profiles_trial_measures_combined(file_path, grouping_variable='trial_id'):
+def align_individual_player_profiles_trial_measures_combined(file_path, output_file_path, grouping_variable='trial_id'):
     df = read_csv(file_path)
     df = preprocess_df(df)
     # Define attribute sets
@@ -595,5 +602,5 @@ def align_individual_player_profiles_trial_measures_combined(file_path, grouping
             all_results_df = pd.merge(all_results_df, results_df, on='trial_id', how='outer')
 
     # Save to CSV
-    all_results_df.to_csv(file_path, index=False)
+    all_results_df.to_csv(output_file_path, index=False)
     # print("All results saved to Study_4_teams_alignment_results_combined.csv")
