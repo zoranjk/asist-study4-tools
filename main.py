@@ -33,6 +33,7 @@ if __name__ == "__main__":
     trial_measures_team_combined_file_path = os.path.join(data_dir_path, "trial_measures_team_combined.csv")
     trial_level_team_profiles_file_path = os.path.join(data_dir_path, "trial_level_team_profiles.csv")
     team_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "team_player_profiles_trial_measures_combined.csv")
+    # team_trials_summary_profiles_surveys_repeats_file_path = os.path.join(data_dir_path, "team_trials_summary_profiles_surveys_repeats.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -113,5 +114,14 @@ if __name__ == "__main__":
     #                                                         teams_alignment_results_combined_file_path,
     #                                                         team_player_profiles_trial_measures_combined_file_path)
     
-    print("Identifying repeat teams in combined team player profiles trial measures...")
-    team.identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path)
+    # print("Identifying repeat teams in combined team player profiles trial measures...")
+    # team.identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path)
+
+    # # TODO: Figure out where to get Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv
+    # # for this and next function call.
+    # print("Writing teams trials summary profiles survey repeats...")
+    # team.write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial_measures_combined_file_path,
+    #                                                        teams_trial_summary_profiles_surveys_file_path)
+    
+    # print("Writing teams trials summary_profiles_survey_scores_repeats...")
+    # team.write_teams_trial_summary_profiles_survey_scores_repeats()

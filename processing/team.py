@@ -299,3 +299,52 @@ def identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path
     df.to_csv(team_player_profiles_trial_measures_combined_file_path, index=False)
 
     # print(f"Modified file saved to {output_file_path}")
+
+
+# TODO: figure out what's up with these two (csv files that aren't generated)
+#################################################################
+# functions for writing teams trial summary profiles survey files
+#################################################################
+
+def write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial_measures_combined_file_path,
+                                                      teams_trial_summary_profiles_surveys_file_path,
+                                                      output_file_path):
+    # File paths
+    # file1 = r'C:\Post-doc Work\ASIST Study 4\Study_4_team_playerProfiles_trialMeasures_Combined.csv'
+    # file2 = r'Study_4_Teams_TrialSummary_Profiles_Surveys_ForAnalysis.csv'
+
+    # Read the CSV files
+    df1 = pd.read_csv(team_player_profiles_trial_measures_combined_file_path)
+    df2 = pd.read_csv(teams_trial_summary_profiles_surveys_file_path)
+
+    # Select only the 'trial_id' and 'Team_Combination_Count' columns from the first dataframe
+    df1_selected = df1[['trial_id', 'Team_Combination_Count']]
+
+    # Merge the dataframes on 'trial_id'
+    merged_df = pd.merge(df2, df1_selected, on='trial_id', how='left')
+
+    # Save the merged dataframe to a new CSV file
+    # output_file = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv'
+    merged_df.to_csv(output_file_path, index=False)
+
+    # print(f"Merged file saved as {output_file}")
+
+
+def write_teams_trial_summary_profiles_surveys_scores_repeats():
+    # File paths
+    file1 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Trial_Data_5-7-2024.csv'
+    file2 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv'
+
+    # Read the CSV files
+    df1 = pd.read_csv(file1)
+    df2 = pd.read_csv(file2)
+
+    # Select only the 'trial_id' and 'Team_Combination_Count' columns from the first dataframe
+    df1_selected = df1[['trial_id', 'Team_Score']]
+
+    # Merge the dataframes on 'trial_id'
+    merged_df = pd.merge(df2, df1_selected, on='trial_id', how='left')
+
+    # Save the merged dataframe to a new CSV file
+    output_file = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Scores_Repeats_ForAnalysis.csv'
+    merged_df.to_csv(output_file, index=False)
