@@ -224,3 +224,37 @@ def calculate_trial_level_team_profiles(individual_player_profiles_trial_measure
     # Save the new DataFrame to a CSV file
     team_profiles.to_csv(output_file_path, index=False)
     # print(f'Team profiles saved to {output_file_path}')
+
+
+#
+#
+#
+
+def write_team_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+                                                       trial_level_team_profiles_file_path,
+                                                       teams_alignment_results_combined_file_path,
+                                                       output_file_path):
+    # Define the file paths
+    # trial_measures_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_trial_measures_TeamCombined.csv'
+    # trial_level_profiles_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_trialLevel_TeamProfiles.csv'
+    # teams_alignment_results_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_teams_alignment_results_combined.csv'
+    # output_path = 'C:/Post-doc Work/ASIST Study 4/Study_4_team_playerProfiles_trialMeasures_Combined.csv'
+
+    # Read in the files
+    trial_measures = pd.read_csv(trial_measures_team_combined_file_path)
+    trial_level_profiles = pd.read_csv(trial_level_team_profiles_file_path)
+    teams_alignment_results = pd.read_csv(teams_alignment_results_combined_file_path)  # Reading the new CSV
+
+    # Combine the trial measures and trial level profiles on 'trial_id'
+    combined_data = pd.merge(trial_measures, trial_level_profiles, on='trial_id', how='outer')
+
+    # Further integrate the teams alignment results with the combined data on 'trial_id'
+    final_combined_data = pd.merge(combined_data, teams_alignment_results, on='trial_id', how='outer')
+
+    # Add a column for duplicate counts of 'trial_id'
+    final_combined_data['duplicate_count'] = final_combined_data.groupby('trial_id')['trial_id'].transform('count')
+
+    # Save the final combined dataset to a new CSV file
+    final_combined_data.to_csv(output_file_path, index=False)
+
+    # print('Team profiles, trial summary data, and team alignment results have been successfully combined and saved to', output_file_path)

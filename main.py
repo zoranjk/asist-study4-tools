@@ -32,6 +32,7 @@ if __name__ == "__main__":
     teams_alignment_results_combined_file_path = os.path.join(data_dir_path, "teams_alignment_results_combined.csv")
     trial_measures_team_combined_file_path = os.path.join(data_dir_path, "trial_measures_team_combined.csv")
     trial_level_team_profiles_file_path = os.path.join(data_dir_path, "trial_level_team_profiles.csv")
+    team_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "team_player_profiles_trial_measures_combined.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -102,6 +103,12 @@ if __name__ == "__main__":
     # team.collate_team_trial_measures(processed_trial_summary_dir_path,
     #                                  trial_measures_team_combined_file_path)
     
-    print("Calculating trial level team profiles...")
-    team.calculate_trial_level_team_profiles(individual_player_profiles_trial_measures_combined_file_path,
-                                             trial_level_team_profiles_file_path)
+    # print("Calculating trial level team profiles...")
+    # team.calculate_trial_level_team_profiles(individual_player_profiles_trial_measures_combined_file_path,
+    #                                          trial_level_team_profiles_file_path)
+    
+    print("Writing combined team player profiles trial measures...")
+    team.write_team_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+                                                            trial_level_team_profiles_file_path,
+                                                            teams_alignment_results_combined_file_path,
+                                                            team_player_profiles_trial_measures_combined_file_path)
