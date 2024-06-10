@@ -4,6 +4,7 @@ import os
 import json
 import pandas as pd
 import csv
+from pathlib import Path
 from tqdm import tqdm
 
 ##################################
@@ -711,6 +712,7 @@ def process_and_save_file(file_path, individuals_df, teams_df, output_folder):
     final_df.to_csv(new_file_path, index=False)
     # print(f"Processed and saved: {new_file_name}")
 
+
 def add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
                                 individual_player_profiles_trial_measures_combined_file_path,
                                 team_player_profiles_trial_measures_combined_file_path,
@@ -758,3 +760,294 @@ def add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
         if file_name.endswith('.csv'):
             file_path = os.path.join(processed_time_series_cleaned_dir_path, file_name)
             process_and_save_file(file_path, individuals_df, teams_df, output_dir_path)
+
+
+##################################
+# functions for summarizing events
+##################################
+
+def record_trial_info_experiment_mission(df):
+    """Record the entry in column 'trial_info_experiment_mission'."""
+    if 'trial_info_experiment_mission' in df.columns and not df['trial_info_experiment_mission'].empty:
+        return df['trial_info_experiment_mission'].iloc[0]
+    return None
+
+
+def count_communication_messages(df):
+    """Record the number of entries in column 'communicationenvironment_message'."""
+    return df['communicationenvironment_message'].notnull().sum()
+
+
+def count_intervention_responses(df):
+    """Record the number of entries in column 'interventionresponse_intervention_id'."""
+    return df['interventionresponse_intervention_id'].notnull().sum()
+
+
+def record_trial_info_condition(df):
+    """Record the entry in column 'trial_info_condition'."""
+    if 'trial_info_condition' in df.columns and not df['trial_info_condition'].empty:
+        return df['trial_info_condition'].iloc[0]
+    return None
+
+
+def record_trial_info_subjects(df):
+    """Record the entry in column 'trial_info_subjects'."""
+    if 'trial_info_subjects' in df.columns and not df['trial_info_subjects'].empty:
+        return df['trial_info_subjects'].iloc[0]
+    return None
+
+
+def count_playerstate_is_frozen(df):
+    """Record the number of times 'playerstatechanged_is_frozen' shows 'TRUE' with datatype handling."""
+    # Ensure the column is treated as string
+    frozen_column = df['playerstatechanged_is_frozen'].astype(str).str.strip().str.upper()
+    return (frozen_column == 'TRUE').sum()
+
+
+def count_playerstate_ppe(df):
+    """Count occurrences of 'TRUE' and 'FALSE' for playerstatechanged_ppe_equipped with datatype handling."""
+    # Ensure the column is treated as string
+    ppe_column = df['playerstatechanged_ppe_equipped'].astype(str).str.strip().str.upper()
+    counts = {
+        'ppe_equipped_true_count': (ppe_column == 'TRUE').sum(),
+        'ppe_equipped_false_count': (ppe_column == 'FALSE').sum()
+    }
+    return counts
+
+
+def count_sprinting_start(df):
+    if 'sprinting' in df.columns:
+        # Normalize the column data by trimming whitespace and converting to uppercase
+        normalized_sprinting = df['sprinting'].astype(str).str.strip().str.upper()
+        # Count how many times 'TRUE' appears, handling variations in case and whitespace
+        sprinting_start_count = (normalized_sprinting == 'TRUE').sum()
+        return {'sprinting_start_count': sprinting_start_count}
+    else:
+        return {'sprinting_start_count': 0}
+
+
+def record_state_change_outcome_with_prefix(df):
+    if 'state_change_outcome' in df.columns:
+        # Convert the column to string type to ensure .str methods work
+        outcomes = df['state_change_outcome'].astype(str).str.contains('MISSION_STOP_', na=False)
+        unique_outcomes = df.loc[outcomes, 'state_change_outcome'].unique()
+        if len(unique_outcomes) > 0:
+            return unique_outcomes[0]  # Assuming you want the first matching outcome
+        else:
+            return None
+    return None
+
+
+def record_trial_info_map_name(df):
+    """Record the entry in column 'trial_info_map_name'."""
+    if 'trial_info_map_name' in df.columns and not df['trial_info_map_name'].empty:
+        return df['trial_info_map_name'].iloc[0]
+    return None
+
+
+def record_trial_info_trial_id(df):
+    """Record the entry in column 'trial_info_trial_id'."""
+    if 'trial_info_trial_id' in df.columns and not df['trial_info_trial_id'].empty:
+        return df['trial_info_trial_id'].iloc[0]
+    return None
+
+
+def count_toolused_target_block_type(df):
+    """Count for each of the different types of entries in 'toolused_target_block_type'.
+    Append 'toolused_on_' prefix to the output column names."""
+    if 'toolused_target_block_type' in df.columns:
+        # Count occurrences of each unique value
+        counts = df['toolused_target_block_type'].value_counts().to_dict()
+        # Create a new dictionary with modified keys
+        modified_counts = {f'toolused_on_{key}': value for key, value in counts.items()}
+        return modified_counts
+    return {}
+
+
+def count_tool_usage(df):
+    """Count occurrences of each unique tool type in 'toolused_tool_type' column.
+    Prepend 'toolused_count_' to each unique value as the prefix for output column names."""
+    if 'toolused_tool_type' in df.columns:
+        # Count occurrences of each unique value
+        counts = df['toolused_tool_type'].value_counts().to_dict()
+        # Create a new dictionary with modified keys
+        modified_counts = {f'toolused_count_{key}': value for key, value in counts.items()}
+        return modified_counts
+    return {}
+
+
+def max_flocking_visits(df):
+    """Find the maximum number of flocking visits to the store."""
+    if 'flocking_visits_to_store' in df.columns:
+        max_store_visits = df['flocking_visits_to_store'].max()
+    else:
+        max_store_visits = 0
+    return max_store_visits
+
+
+def count_uiclick_element_id(df):
+    if 'uiclick_element_id' in df:
+        counts = df['uiclick_element_id'].value_counts().to_dict()
+        return {f'uiclick_element_id_{key}': value for key, value in counts.items()}
+    else:
+        return {}
+
+
+def record_trial_info_subjects(df):
+    if 'trial_info_subjects' in df and not df['trial_info_subjects'].isnull().all():
+        return {'trial_info_subjects': df['trial_info_subjects'].dropna().iloc[0]}
+    else:
+        return {'trial_info_subjects': None}
+
+
+def count_communicationchat_source(df):
+    if 'communicationchat_source' in df:
+        counts = df['communicationchat_source'].value_counts().to_dict()
+        return {f'communicationchat_source_id_{key}': value for key, value in counts.items()}
+    else:
+        return {}
+
+
+def count_interventionchat_b_id(df):
+    return {'interventionchat_b_count': df['interventionchat_b_id'].notnull().sum()}
+
+
+def record_team_budget_lowest(df):
+    if 'team_budget' in df:
+        return {'team_budget_lowest': df['team_budget'].min()}
+    return {'team_budget_lowest': None}
+
+
+def count_objectstatechange_outcome_by_type(df):
+    if 'objectstatechange_outcome' in df.columns and 'objectstatechange_type' in df.columns:
+        combined = df.groupby(['objectstatechange_type', 'objectstatechange_outcome']).size()
+        return {f'objectstatechange_outcome_count_{idx[0]}_{idx[1]}': count for idx, count in combined.items()}
+    return {}
+
+
+def count_chat_sender(df):
+    if 'chat_sender' in df:
+        counts = df['chat_sender'].value_counts().to_dict()
+        return {f'chat_sender_count_{key}': value for key, value in counts.items()}
+    else:
+        return {}
+
+
+def count_uiclick_meta_action(df):
+    if 'uiclick_meta_action' in df:
+        counts = df['uiclick_meta_action'].value_counts().to_dict()
+        return {f'uiclick_meta_action_count_{key}': value for key, value in counts.items()}
+    else:
+        return {}
+
+
+def count_communicationchat_message(df):
+    return {'communicationchat_message_count': df['communicationchat_message'].notnull().sum()}
+
+
+def record_max_flocking_time_in_store(df):
+    if 'flocking_time_in_store' in df:
+        return {'max_flocking_time_in_store': df['flocking_time_in_store'].max()}
+    return {'max_flocking_time_in_store': None}
+
+
+def count_playerstatechanged_health(df):
+    return {'playerstatechanged_health_count': df['playerstatechanged_health'].notnull().sum()}
+
+
+def find_highest_score_per_participant(df):
+    if 'playerscore' in df.columns and 'participant_id' in df.columns:
+        highest_scores = df.groupby('participant_id')['playerscore'].max()
+        return {f'{participant_id}_highest_score': score for participant_id, score in highest_scores.items()}
+    return {}
+
+
+def count_interventionchat_b_source(df):
+    return {'interventionchat_b_source_count': df['interventionchat_b_source'].notnull().sum()}
+
+
+def retain_one_entry_for_columns(df, columns):
+    # Assumes all rows have the same value for each of these columns, so we take the first non-null value
+    retained_entries = {}
+    for column in columns:
+        if column in df.columns and not df[column].isnull().all():
+            retained_entries[column] = df[column].dropna().iloc[0]
+        else:
+            retained_entries[column] = None
+    return retained_entries
+
+
+def process_file(filepath):
+    """Process each file and generate summary."""
+    df = pd.read_csv(filepath, low_memory=False)
+
+    # Call the function and store its return value
+    mission_state_change_outcome = record_state_change_outcome_with_prefix(df)
+
+    summary = {
+        **count_tool_usage(df),
+        'Max_Store_Visits_flocking': max_flocking_visits(df),
+        **count_playerstate_ppe(df),
+        'Trial_Info_Experiment_Mission': record_trial_info_experiment_mission(df),
+        'Communication_Messages_Count': count_communication_messages(df),
+        'Intervention_Responses_Count': count_intervention_responses(df),
+        'Trial_Info_Condition': record_trial_info_condition(df),
+        **record_trial_info_subjects(df),  # Ensure this isn't duplicating with the line below
+        'Trial_Info_Subjects': record_trial_info_subjects(df)['trial_info_subjects'],  # Adjust based on actual function return
+        'PlayerState_Is_Frozen_Count': count_playerstate_is_frozen(df),
+        'Mission_State_Change_Outcome': mission_state_change_outcome,  # Directly use the returned value
+        'Trial_Info_Map_Name': record_trial_info_map_name(df),
+        'trial_ID': record_trial_info_trial_id(df),  # Ensure key consistency (Trial_ID vs trial_id)
+        **count_toolused_target_block_type(df),
+        **count_uiclick_element_id(df),
+        **count_communicationchat_source(df),
+        **count_sprinting_start(df),
+        **count_interventionchat_b_id(df),
+        **record_team_budget_lowest(df),
+        **count_objectstatechange_outcome_by_type(df),
+        **count_chat_sender(df),
+        **count_uiclick_meta_action(df),
+        **count_communicationchat_message(df),
+        **record_max_flocking_time_in_store(df),
+        **count_playerstatechanged_health(df),
+        **find_highest_score_per_participant(df),
+        **count_interventionchat_b_source(df),
+        **retain_one_entry_for_columns(df, [
+            'team_teamwork_potential_score', 'team_teamwork_potential_category',
+            'team_taskwork_potential_score_liberal', 'team_taskwork_potential_category_liberal',
+            'team_taskwork_potential_score_conservative', 'team_taskwork_potential_category_conservative',
+            'geometric_alignment_allattributes', 'physical_alignment_allattributes',
+            'algebraic_alignment_allattributes', 'centroid_physical_alignment_allattributes',
+            'geometric_alignment_teamworkattributes', 'physical_alignment_teamworkattributes',
+            'algebraic_alignment_teamworkattributes',
+            'centroid_physical_alignment_teamworkattributes',
+            'geometric_alignment_taskworkattributes', 'physical_alignment_taskworkattributes',
+            'algebraic_alignment_taskworkattributes',
+            'centroid_physical_alignment_taskworkattributes'
+        ])
+    }
+
+    summary_for_csv = {key: value if not isinstance(value, dict) else json.dumps(value) for key, value in summary.items()}
+    summary_df = pd.DataFrame([summary_for_csv])
+    return summary_df
+
+
+def summarize_events(processed_time_series_cleaned_profiled_dir_path,
+                     output_dir_path):
+    # input_dir = Path('C:/Post-doc Work/ASIST Study 4/Processed_TimeSeries_CSVs_Cleaned_Profiled')
+    # output_dir = Path('C:/Post-doc Work/ASIST Study 4/Processed_TrialSummary_Output_CSVs')
+    # output_dir.mkdir(exist_ok=True)
+    output_dir_path = Path(output_dir_path)
+    output_dir_path.mkdir(exist_ok=True)
+    # os.makedirs(output_dir_path, exist_ok=True)
+    processed_time_series_cleaned_profiled_dir_path = Path(processed_time_series_cleaned_profiled_dir_path)
+
+    for filepath in tqdm(processed_time_series_cleaned_profiled_dir_path.glob('*.csv')):
+        # Modify the filename by replacing the suffix
+        new_filename = filepath.name.replace('_TimeSeriesData_Profiled', '_TrialSummary_Profiled')
+        output_filename = output_dir_path / new_filename
+
+        summary_df = process_file(filepath)  # summary is already a DataFrame now
+        summary_df.to_csv(output_filename, index=False)  # Save the DataFrame directly
+        # print(f'Summary saved to {output_filename}')
+

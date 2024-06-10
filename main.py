@@ -34,6 +34,7 @@ if __name__ == "__main__":
     processed_time_series_dir_path = os.path.join(data_dir_path, "processed_time_series")
     processed_time_series_cleaned_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned")
     processed_time_series_cleaned_profiled_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned_profiled")
+    processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -138,8 +139,12 @@ if __name__ == "__main__":
     # timeseries.clean_time_series(processed_time_series_dir_path,
     #                              processed_time_series_cleaned_dir_path)
     
-    print("Adding profiles to time series data...")
-    timeseries.add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
-                                           individual_player_profiles_trial_measures_combined_file_path,
-                                           team_player_profiles_trial_measures_combined_file_path,
-                                           processed_time_series_cleaned_profiled_dir_path)
+    # print("Adding profiles to time series data...")
+    # timeseries.add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
+    #                                        individual_player_profiles_trial_measures_combined_file_path,
+    #                                        team_player_profiles_trial_measures_combined_file_path,
+    #                                        processed_time_series_cleaned_profiled_dir_path)
+
+    print("Summarizing time series events...")
+    timeseries.summarize_events(processed_time_series_cleaned_profiled_dir_path,
+                                processed_trial_summary_dir_path)
