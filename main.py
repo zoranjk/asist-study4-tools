@@ -122,3 +122,7 @@ if __name__ == "__main__":
     
     # print("Writing teams trials summary_profiles_survey_scores_repeats...")
     # team.write_teams_trial_summary_profiles_survey_scores_repeats()
+
+    print("Integrating combined team trial measures into combined individual player profiles trial measures...")
+    team.integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+                                                                      individual_player_profiles_trial_measures_combined_file_path)

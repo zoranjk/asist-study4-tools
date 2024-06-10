@@ -348,3 +348,32 @@ def write_teams_trial_summary_profiles_surveys_scores_repeats():
     # Save the merged dataframe to a new CSV file
     output_file = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Scores_Repeats_ForAnalysis.csv'
     merged_df.to_csv(output_file, index=False)
+
+##############################################################################
+# functions for post-hoc integrating individual player profiles trial measures
+##############################################################################
+
+def integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+                                                                 individual_player_profiles_trial_measures_combined_file_path):
+    # Paths to the CSV files
+    # team_combined_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_trial_measures_TeamCombined.csv'
+    # individual_profiles_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_playerProfiles_trialMeasures_Combined.csv'
+
+    # Load the CSV files into pandas DataFrames
+    team_combined_df = pd.read_csv(trial_measures_team_combined_file_path)
+    individual_profiles_df = pd.read_csv(individual_player_profiles_trial_measures_combined_file_path)
+
+    # Selecting the relevant columns from the team_combined DataFrame
+    team_combined_df = team_combined_df[['trial_id', 'MissionEndCondition', 'TrialEndCondition']]
+
+    # Merging the DataFrames on 'trial_id'
+    # The merge operation is left by default, which means all rows from the individual_profiles_df
+    # will be kept, and matching rows from team_combined_df will be merged based on 'trial_id'.
+    # This will automatically replicate the trial information for each PLAYER_ID associated with a given trial_id.
+    merged_df = pd.merge(individual_profiles_df, team_combined_df, on='trial_id', how='left')
+
+    # Save the merged DataFrame to a new CSV file
+    # output_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_playerProfiles_trialMeasures_Combined.csv'
+    merged_df.to_csv(individual_player_profiles_trial_measures_combined_file_path, index=False)
+
+    # print(f'Merged data saved to {output_path}')
