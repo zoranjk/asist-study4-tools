@@ -1,4 +1,4 @@
-from processing import download, extract, dedup, etl, metadata, survey, team
+from processing import download, extract, dedup, etl, metadata, survey, team, timeseries
 
 import json
 import os
@@ -31,6 +31,7 @@ if __name__ == "__main__":
     team_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "team_player_profiles_trial_measures_combined.csv")
     # TODO: this file path isn't necessary until i figure out those missing CSV files
     # team_trials_summary_profiles_surveys_repeats_file_path = os.path.join(data_dir_path, "team_trials_summary_profiles_surveys_repeats.csv")
+    processed_time_series_dir_path = os.path.join(data_dir_path, "processed_time_series")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -123,6 +124,10 @@ if __name__ == "__main__":
     # print("Writing teams trials summary_profiles_survey_scores_repeats...")
     # team.write_teams_trial_summary_profiles_survey_scores_repeats()
 
-    print("Integrating combined team trial measures into combined individual player profiles trial measures...")
-    team.integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
-                                                                      individual_player_profiles_trial_measures_combined_file_path)
+    # print("Integrating combined team trial measures into combined individual player profiles trial measures...")
+    # team.integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
+    #                                                                   individual_player_profiles_trial_measures_combined_file_path)
+    
+    print("Processing time series messages...")
+    timeseries.extract_and_write_time_series(metadata_unique_dir_path,
+                                             processed_time_series_dir_path)

@@ -6,3 +6,4 @@ from . import etl
 from . import metadata
 from . import survey
 from . import team
+from . import timeseries
