@@ -2,6 +2,7 @@
 
 import os
 import json
+import pandas as pd
 import csv
 from tqdm import tqdm
 
@@ -589,10 +590,97 @@ def extract_and_write_time_series(metadata_unique_dir_path, processed_time_serie
                     print(f"Skipping invalid JSON line in file: {filename}")
         # print(f"Processed {file_index}/{total_files} files ({(file_index / total_files) * 100:.2f}%)")
 
-# # Main execution
-# folder_path = 'F:\\ASIST Study 4\\Study4_MetadataFiles_Unique'
-# output_folder = 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_CSVs'  # Specify the desired output folder here
-# extract_and_save_data(folder_path, output_folder)
 
+#########################################
+# functions for cleaning time series csvs
+#########################################
 
+def estimate_elapsed_milliseconds_and_convert_timestamp(df):
+    # Convert timestamp to a numeric value (e.g., UNIX timestamp)
+    # First, ensure conversion to datetime is correct
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Convert datetime to UNIX timestamp in seconds
+    df['timestamp_numeric'] = df['timestamp'].astype('int64') // 10 ** 9
+
+    # Find the start row
+    start_rows = df[df['mission_state'] == "Start"]
+    if not start_rows.empty:
+        start_row = start_rows.iloc[0]
+        start_timestamp = start_row['timestamp']
+        start_elapsed = start_row['elapsed_milliseconds'] if 'elapsed_milliseconds' in start_row and not pd.isnull(
+            start_row['elapsed_milliseconds']) else 0
+
+        # Calculate elapsed milliseconds for each row based on the 'start' timestamp
+        df['estimated_elapsed_ms'] = (df['timestamp'] - start_timestamp).dt.total_seconds() * 1000 + start_elapsed
+    else:
+        print("Warning: No rows with 'mission_state' == 'Start' found.")
+        df['estimated_elapsed_ms'] = pd.NA  # or set to 0 or any other default value as needed
+
+    return df
+
+def clean_time_series(processed_time_series_dir_path,
+                      processed_time_series_cleaned_dir_path):
+    os.makedirs(processed_time_series_cleaned_dir_path, exist_ok=True)
+
+    # List of columns to remove
+    columns_to_remove = [
+        'metadata', 'study_version', 'MissionEndCondition', 'gold_pub_minute',
+        'alignment_alpha_bravo_delta_stage', 'TimesFrozen', 'semantic_map', 'period',
+        'motion_y', 'observers', 'BudgetExpended', 'date', 'dependencies', 'td',
+        'BombBeaconsPlaced', 'TeammatesRescued', 'locations', 'group', 'y', 'id',
+        'BombsExploded', 'door_x', 'experiment_name', 'list', 'observation', 'agent',
+        'blocks', 'responder', 'open', 'Alpha_goal', 'gelp_results',
+        'item_name', 'TeamsList', 'version', 'ParticipationCount', 'phase', 'z',
+        'corresponding_observation_number', 'observation_number', 'item_id',
+        'TotalStoreTime', 'status', 'obj', 'requester', 'currAttributes', 'Delta',
+        'additional_info', 'NumFieldVisits', 'door_y', 'compact_extractions',
+        'predictions', 'MissionVariant', 'exited_locations', 'request_time',
+        'gold_results', 'OptionalSurveys', 'alignment_alpha_bravo_trial',
+        'alignment_alpha_bravo_stage', 'type', 'separation', 'config', 'client_info',
+        'transitionsToShop', 'entered_blocks', 'alignment_bravo_delta_stage',
+        'playerScores', 'intervention_agents', 'experiment_mission', 'jag', 'priority',
+        'corrected_text', 'ExperimentName', 'agent_name', 'group_number', 'alignment',
+        'response_time_duration', 'TrialId', 'source', 'yaw', 'message',
+        'semantic_map_name', 'created_ts', 'event_properties',
+        'agent_type', 'exited_grid_location', 'left_blocks', 'exited_connections',
+        'amount_discarded', 'Bravo_goal', 'stage_start', 'respond_stage', 'ExperimentId',
+        'testbed_version', 'triggering_entity', 'equippeditemname', 'subjects',
+        'response_index', 'gold_msg_id', 'bomb_id', 'requested_tool', 'gelp_msg_id',
+        'CommBeaconsPlaced', 'experiment_date', 'PreTrialSurveys', 'subscribes',
+        'response_tool', 'TrialName', 'tool_type', 'request_stage', 'connections',
+        'callsign', 'gelp_pub_minute', 'cohesion', 'TeamId', 'DamageTaken',
+        'LastActiveMissionTime', 'alignment_bravo_delta_trial', 'player_y', 'BombsTotal',
+        'res_player_compliance_by_all_reqs', 'surveys', 'notes', 'motion_x',
+        'map_block_filename', 'grid_location', 'records', 'Team', 'utterance_id',
+        'FlagsPlaced', 'participant', 'team_id', 'door_z', 'ObjectStateChange_fuse_start_minute',
+        'TextChatsSent', 'text', 'life', 'alignment_alpha_delta_trial', 'ParticipantId',
+        'mission', 'map_name', 'state', 'experimenter', 'x', 'Bravo', 'measure_data',
+        'condition', 'time_in_store', 'FiresExtinguished', 'player_x',
+        'player_z', 'pitch', 'created', 'publishes', 'stage_end', 'owner', 'respond_time',
+        'NumCompletePostSurveys', 'remaining_sequence', 'alignment_alpha_bravo_delta_trial',
+        'complied_dyad_raw_balance', 'BombSummaryPlayer', 'changedAttributes', 'active',
+        'Members', 'experiment_author', 'extractions',
+        'dyad_compliance_by_requester_reqs', 'Delta_goal',
+        'alignment_alpha_delta_stage', 'created_elapsed_time',
+        'complied_dyad_raw', 'trial_number', 'currInv', 'PostTrialSurveys', 'swinging',
+        'motion_z', 'study_number', 'Alpha', 'name' , 'SuccessfulBombDisposals', 'response',
+        'interventions-given'
+    ]
+
+    # Iterate through each file in the directory
+    for filename in tqdm(os.listdir(processed_time_series_dir_path)):
+        if filename.endswith('.csv'):
+            file_path = os.path.join(processed_time_series_dir_path, filename)
+            df = pd.read_csv(file_path, low_memory=False)
+
+            # Remove the unwanted columns
+            df.drop(columns_to_remove, axis=1, inplace=True, errors='ignore')
+
+            # Estimate elapsed_milliseconds and convert timestamp
+            df = estimate_elapsed_milliseconds_and_convert_timestamp(df)
+
+            # Save the updated dataframe to a new file in the output folder
+            output_file_path = os.path.join(processed_time_series_cleaned_dir_path, filename)
+            df.to_csv(output_file_path, index=False)
+            # print(f'Processed {filename}')
 

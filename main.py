@@ -32,6 +32,7 @@ if __name__ == "__main__":
     # TODO: this file path isn't necessary until i figure out those missing CSV files
     # team_trials_summary_profiles_surveys_repeats_file_path = os.path.join(data_dir_path, "team_trials_summary_profiles_surveys_repeats.csv")
     processed_time_series_dir_path = os.path.join(data_dir_path, "processed_time_series")
+    processed_time_series_cleaned_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -128,6 +129,10 @@ if __name__ == "__main__":
     # team.integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
     #                                                                   individual_player_profiles_trial_measures_combined_file_path)
     
-    print("Processing time series messages...")
-    timeseries.extract_and_write_time_series(metadata_unique_dir_path,
-                                             processed_time_series_dir_path)
+    # print("Processing time series messages...")
+    # timeseries.extract_and_write_time_series(metadata_unique_dir_path,
+    #                                          processed_time_series_dir_path)
+
+    print("Cleaning time series messages...")
+    timeseries.clean_time_series(processed_time_series_dir_path,
+                                 processed_time_series_cleaned_dir_path)
