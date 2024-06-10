@@ -684,3 +684,77 @@ def clean_time_series(processed_time_series_dir_path,
             df.to_csv(output_file_path, index=False)
             # print(f'Processed {filename}')
 
+
+##########################################
+# functions to add profiles to time series
+##########################################
+
+# Function to process and save a file
+def process_and_save_file(file_path, individuals_df, teams_df, output_folder):
+    # Read the time series CSV, convert column names to lowercase, and 'participant_id', 'trial_id' to string
+    time_series_df = pd.read_csv(file_path, low_memory=False)
+    time_series_df.columns = time_series_df.columns.str.lower()
+    time_series_df['participant_id'] = time_series_df['participant_id'].astype(str)
+    time_series_df['trial_id'] = time_series_df['trial_id'].astype(str)
+
+    # Merge with individuals data
+    merged_df = pd.merge(time_series_df, individuals_df, on=['participant_id', 'trial_id'], how='left')
+
+    # Merge with teams data
+    final_df = pd.merge(merged_df, teams_df, on='trial_id', how='left')
+
+    # Prepare new file path for the output folder
+    new_file_name = os.path.basename(file_path).replace('.csv', '_Profiled.csv')
+    new_file_path = os.path.join(output_folder, new_file_name)
+
+    # Save to new file
+    final_df.to_csv(new_file_path, index=False)
+    # print(f"Processed and saved: {new_file_name}")
+
+def add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
+                                individual_player_profiles_trial_measures_combined_file_path,
+                                team_player_profiles_trial_measures_combined_file_path,
+                                output_dir_path):
+
+    # Ensure the output directory exists
+    os.makedirs(output_dir_path, exist_ok=True)
+
+    # Read the individual and team datasheets with specified columns
+    individuals_df = pd.read_csv(individual_player_profiles_trial_measures_combined_file_path,
+                                 usecols=['participant_ID', 'trial_id', 'Teamwork_potential_score',
+                                          'Taskwork_potential_score', 'Teamwork_potential_category',
+                                          'Taskwork_potential_category_liberal',
+                                          'Taskwork_potential_category_conservative'])
+    teams_df = pd.read_csv(team_player_profiles_trial_measures_combined_file_path,
+                           usecols=['trial_id', 'Team_teamwork_potential_score', 'Team_teamwork_potential_category',
+                                    'Team_taskwork_potential_score_liberal', 'Team_taskwork_potential_category_liberal',
+                                    'Team_taskwork_potential_score_conservative',
+                                    'Team_taskwork_potential_category_conservative',
+                                    'geometric_alignment_allAttributes',    'physical_alignment_allAttributes',
+                                    'algebraic_alignment_allAttributes',    'centroid_physical_alignment_allAttributes',
+                                    'geometric_alignment_teamworkAttributes',    'physical_alignment_teamworkAttributes',
+                                    'algebraic_alignment_teamworkAttributes',
+                                    'centroid_physical_alignment_teamworkAttributes',
+                                    'geometric_alignment_taskworkAttributes',   'physical_alignment_taskworkAttributes',
+                                    'algebraic_alignment_taskworkAttributes',
+                                    'centroid_physical_alignment_taskworkAttributes'
+                                    ])
+
+    # Convert the column names to lowercase for consistency
+    individuals_df.columns = individuals_df.columns.str.lower()
+    teams_df.columns = teams_df.columns.str.lower()
+
+    # Rename individual player columns, excluding 'participant_id' and 'trial_id'
+    individuals_df.columns = ['player_' + col if col not in ['participant_id', 'trial_id'] else col for col in
+                            individuals_df.columns]
+
+    # Convert 'participant_id' and 'trial_id' in both DataFrames to string to avoid type mismatch
+    individuals_df['participant_id'] = individuals_df['participant_id'].astype(str)
+    individuals_df['trial_id'] = individuals_df['trial_id'].astype(str)
+    teams_df['trial_id'] = teams_df['trial_id'].astype(str)
+
+    # Iterate over CSV files in the folder and process them
+    for file_name in tqdm(os.listdir(processed_time_series_cleaned_dir_path)):
+        if file_name.endswith('.csv'):
+            file_path = os.path.join(processed_time_series_cleaned_dir_path, file_name)
+            process_and_save_file(file_path, individuals_df, teams_df, output_dir_path)
