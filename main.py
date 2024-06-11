@@ -36,6 +36,9 @@ if __name__ == "__main__":
     processed_time_series_cleaned_profiled_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned_profiled")
     processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
     trial_summary_profiled_file_path = os.path.join(data_dir_path, "trial_summary_profiled.csv")
+    trial_summary_profiled_post_processed_file_path = os.path.join(data_dir_path, "trial_summary_profiled_post_processed.csv")
+    trial_summary_profiled_cleaned_file_path = os.path.join(data_dir_path, "trial_summary_profiled_cleaned.csv")
+    trial_summary_profiled_surveys_file_path = os.path.join(data_dir_path, "trial_summary_profiled_surveys.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -150,6 +153,13 @@ if __name__ == "__main__":
     # timeseries.summarize_events(processed_time_series_cleaned_profiled_dir_path,
     #                             processed_trial_summary_dir_path)
 
-    print("Writing profiled trial summaries...")
-    timeseries.collate_summaries(processed_trial_summary_dir_path,
-                                 trial_summary_profiled_file_path)
+    # print("Writing profiled trial summaries...")
+    # timeseries.collate_summaries(processed_trial_summary_dir_path,
+    #                              trial_summary_profiled_file_path)
+
+    print("Post-processing trial summaries...")
+    timeseries.post_process_trial_summaries(trial_summary_profiled_file_path,
+                                            trial_summary_profiled_post_processed_file_path,
+                                            trial_summary_profiled_cleaned_file_path,
+                                            trial_level_team_profiles_file_path,
+                                            trial_summary_profiled_surveys_file_path)

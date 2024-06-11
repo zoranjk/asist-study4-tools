@@ -1079,4 +1079,277 @@ def collate_summaries(processed_trial_summary_dir_path,
 
     # print(f'Combined CSV saved to: {output_file_path}')
 
-    
+#############################################
+# functions for trial summary post processing
+#############################################
+
+def remove_specified_columns(dataframe, columns_to_remove):
+    """
+    Removes specified columns from the DataFrame if they exist.
+
+    :param dataframe: The pandas DataFrame from which to remove columns.
+    :param columns_to_remove: A list of column names to remove from the DataFrame.
+    """
+    # Ensures only existing columns are attempted to be removed, avoiding KeyErrors
+    existing_columns = [col for col in columns_to_remove if col in dataframe.columns]
+    dataframe.drop(columns=existing_columns, inplace=True, errors='ignore')
+
+
+def sum_tool_usage(dataframe, new_column, columns_to_sum):
+    """
+    Sums the values of specified columns in a dataframe and creates a new column with the result.
+
+    :param dataframe: The dataframe to modify.
+    :param new_column: The name of the new column to be created.
+    :param columns_to_sum: A list of column names whose values are to be summed.
+    """
+    dataframe[new_column] = dataframe[columns_to_sum].sum(axis=1)
+
+
+def rename_column(dataframe, old_column, new_column):
+    """
+    Renames a column in the dataframe.
+
+    :param dataframe: The dataframe to modify.
+    :param old_column: The name of the column to be renamed.
+    :param new_column: The new name for the column.
+    """
+    dataframe.rename(columns={old_column: new_column}, inplace=True)
+
+
+def create_columns_based_on_criteria(dataframe, task_descriptions):
+    """
+    Creates new columns based on specific criteria outlined in task descriptions.
+    """
+    for desc in task_descriptions:
+        column_name = desc['new_column']
+        columns_to_sum = desc['columns_to_sum']
+        sum_tool_usage(dataframe, column_name, columns_to_sum)
+
+
+def calculate_score_extremes(dataframe, suffix='_highest_score'):
+    """
+    Calculates the maximum and minimum scores for each row across columns with a specific suffix.
+    """
+    score_columns = [col for col in dataframe.columns if col.endswith(suffix)]
+    dataframe['player_score_max'] = dataframe[score_columns].max(axis=1)
+    dataframe['player_score_min'] = dataframe[score_columns].min(axis=1)
+
+
+def process_csv(input_filepath, output_filepath):
+    """
+    Processes the CSV file according to the specified tasks.
+
+    :param input_filepath: The path to the input CSV file.
+    :param output_filepath: The path where the output CSV file will be saved.
+    """
+    # Load the CSV file into a DataFrame
+    df = pd.read_csv(input_filepath)
+
+    # Define columns to remove based on suffixes and prefixes
+    columns_with_suffix = [col for col in df.columns if col.endswith('_highest_score')]
+    columns_with_prefix = [col for col in df.columns if col.startswith('chat_sender_count_')]
+
+    sum_tool_usage(df, 'Wirecutters_Used', [
+        'toolused_count_WIRECUTTERS_GREEN',
+        'toolused_count_WIRECUTTERS_RED',
+        'toolused_count_WIRECUTTERS_BLUE'
+    ])
+    sum_tool_usage(df, 'toolused_on_beacon_bomb', [
+        'toolused_on_block_beacon_bomb',
+        'toolused_on_asistmod:block_beacon_bomb'
+    ])
+    sum_tool_usage(df, 'toolused_on_beacon_hazard', [
+        'toolused_on_block_beacon_hazard',
+        'toolused_on_asistmod:block_beacon_hazard'
+    ])
+    sum_tool_usage(df, 'toolused_on_bomb_chained', [
+        'toolused_on_asistmod:block_bomb_chained',
+        'toolused_on_block_bomb_chained'
+    ])
+    sum_tool_usage(df, 'toolused_on_bomb_standard', [
+        'toolused_on_asistmod:block_bomb_standard',
+        'toolused_on_block_bomb_standard'
+    ])
+
+    sum_tool_usage(df, 'toolused_on_bomb_fire', [
+        'toolused_on_asistmod:block_bomb_fire',
+        'toolused_on_block_bomb_fire'
+    ])
+
+    rename_column(df, 'toolused_on_asistmod:block_fire_custom', 'toolused_on_fire')
+
+    rename_column(df, 'toolused_on_asistmod:block_bomb_disposer', 'toolused_on_bomb_disposer')
+
+    rename_column(df, 'trial_ID', 'trial_id')
+
+    rename_column(df, 'interventionchat_b_count', 'interventionchat_count')
+
+    ui_click_columns = [
+        'uiclick_element_id_2_1_+', 'uiclick_element_id_1_1_+', 'uiclick_element_id_0_0_+',
+        'uiclick_element_id_1_0_+', 'uiclick_element_id_0_2_+', 'uiclick_element_id_3_0_+',
+        'uiclick_element_id_2_2_+', 'uiclick_element_id_4_0_+', 'uiclick_element_id_6_1_+',
+        'uiclick_element_id_LeaveStoreButton', 'uiclick_element_id_7_0_+',
+        'uiclick_element_id_MissionBriefCloseButton', 'uiclick_element_id_0_2_-',
+        'uiclick_element_id_6_0_+', 'uiclick_element_id_7_2_+', 'uiclick_element_id_1_2_-',
+        'uiclick_element_id_1_2_+', 'uiclick_element_id_4_2_+', 'uiclick_element_id_3_2_+',
+        'uiclick_element_id_3_1_+', 'uiclick_element_id_2_0_+', 'uiclick_element_id_0_1_+',
+        'uiclick_element_id_4_2_-', 'uiclick_element_id_3_2_-', 'uiclick_element_id_5_2_+',
+        'uiclick_element_id_2_2_-', 'uiclick_element_id_4_1_+', 'uiclick_element_id_5_1_+',
+        'uiclick_element_id_6_2_+', 'uiclick_element_id_7_1_+', 'uiclick_element_id_flag_Delta_0',
+        'uiclick_element_id_2_0_-', 'uiclick_element_id_1_1_-', 'uiclick_element_id_2_1_-',
+        'uiclick_meta_action_count_PLANNING_FLAG_UPDATE', 'uiclick_element_id_7_0_-',
+        'uiclick_meta_action_count_PLANNING_FLAG_PLACED', 'uiclick_element_id_delete-button',
+        'uiclick_element_id_flag_Bravo_3', 'uiclick_element_id_flag_Bravo_2',
+        'uiclick_element_id_flag_Bravo_1', 'uiclick_element_id_flag_Bravo_0',
+        'uiclick_meta_action_count_UNDO_PLANNING_FLAG_PLACED', 'uiclick_element_id_8_1_+',
+        'uiclick_element_id_5_0_-', 'uiclick_element_id_5_0_+', 'uiclick_element_id_8_2_+',
+        'uiclick_element_id_8_0_+', 'uiclick_element_id_3_1_-', 'uiclick_element_id_0_0_-',
+        'uiclick_element_id_4_0_-', 'uiclick_element_id_6_0_-', 'uiclick_element_id_5_1_-',
+        'uiclick_element_id_4_1_-', 'uiclick_element_id_0_1_-', 'uiclick_element_id_6_1_-',
+        'uiclick_element_id_7_2_-', 'uiclick_element_id_3_0_-', 'uiclick_element_id_6_2_-',
+        'uiclick_element_id_8_1_-', 'uiclick_element_id_5_2_-', 'uiclick_element_id_7_1_-',
+        'uiclick_element_id_8_2_-', 'uiclick_element_id_8_0_-'
+    ]
+
+    task_descriptions = [
+        {
+            'new_column': 'defused_bombs_count',
+            'columns_to_sum': [
+                'objectstatechange_outcome_count_block_bomb_chained_DEFUSED',
+                'objectstatechange_outcome_count_block_bomb_fire_DEFUSED',
+                'objectstatechange_outcome_count_block_bomb_standard_DEFUSED'
+            ]
+        },
+        {
+            'new_column': 'defused_disposer_bombs_count',
+            'columns_to_sum': [
+                'objectstatechange_outcome_count_block_bomb_chained_DEFUSED_DISPOSER',
+                'objectstatechange_outcome_count_block_bomb_standard_DEFUSED_DISPOSER',
+                'objectstatechange_outcome_count_block_bomb_fire_DEFUSED_DISPOSER'
+            ]
+        },
+
+        {
+            'new_column': 'exploded_bombs_count',
+            'columns_to_sum': [
+                'objectstatechange_outcome_count_block_bomb_chained_EXPLODE_TIME_LIMIT',
+                'objectstatechange_outcome_count_block_bomb_fire_EXPLODE_TIME_LIMIT',
+                'objectstatechange_outcome_count_block_bomb_standard_EXPLODE_TIME_LIMIT',
+                'objectstatechange_outcome_count_block_bomb_chained_EXPLODE_TOOL_MISMATCH',
+                'objectstatechange_outcome_count_block_bomb_fire_EXPLODE_TOOL_MISMATCH',
+                'objectstatechange_outcome_count_block_bomb_standard_EXPLODE_TOOL_MISMATCH',
+                'objectstatechange_outcome_count_block_bomb_chained_EXPLODE_CHAINED_ERROR',
+                'objectstatechange_outcome_count_block_bomb_standard_EXPLODE_FIRE',
+                'objectstatechange_outcome_count_block_bomb_fire_EXPLODE_FIRE',
+                'objectstatechange_outcome_count_block_bomb_chained_EXPLODE_FIRE'
+            ]
+        },
+
+        {
+            'new_column': 'triggered_bombs_count',
+            'columns_to_sum': [
+                'objectstatechange_outcome_count_block_bomb_standard_TRIGGERED',
+                'objectstatechange_outcome_count_block_bomb_fire_TRIGGERED',
+                'objectstatechange_outcome_count_block_bomb_chained_TRIGGERED'
+            ]
+        },
+
+        {
+            'new_column': 'triggered_advance_seq_bombs_count',
+            'columns_to_sum': [
+                'objectstatechange_outcome_count_block_bomb_fire_TRIGGERED_ADVANCE_SEQ',
+                'objectstatechange_outcome_count_block_bomb_standard_TRIGGERED_ADVANCE_SEQ',
+                'objectstatechange_outcome_count_block_bomb_chained_TRIGGERED_ADVANCE_SEQ'
+            ]
+        }
+    ]
+
+    create_columns_based_on_criteria(df, task_descriptions)
+
+    flags_columns = [
+        # Delta flags
+        *[f'uiclick_element_id_flag_Delta_{i}' for i in range(16)],
+        # Bravo flags
+        *[f'uiclick_element_id_flag_Bravo_{i}' for i in range(23)],
+        # Alpha flags
+        *[f'uiclick_element_id_flag_Alpha_{i}' for i in range(13)],
+        # Planning actions
+        'uiclick_meta_action_count_PLANNING_FLAG_UPDATE',
+        'uiclick_meta_action_count_PLANNING_FLAG_PLACED',
+        'uiclick_meta_action_count_UNDO_PLANNING_FLAG_PLACED'
+    ]
+
+    calculate_score_extremes(df)
+
+    sum_tool_usage(df, 'uiclick_interact_count', ui_click_columns)
+    sum_tool_usage(df, 'ui_flags_interaction_count', flags_columns)
+
+    columns_to_remove = [
+        'toolused_count_WIRECUTTERS_GREEN', 'toolused_count_WIRECUTTERS_RED', 'toolused_count_WIRECUTTERS_BLUE',
+        'ppe_equipped_false_count', 'Trial_Info_Subjects', 'toolused_on_grass', 'toolused_on_dirt',
+        'toolused_on_minecraft:air', 'toolused_on_block_beacon_bomb', 'toolused_on_asistmod:block_beacon_bomb',
+        'toolused_on_block_beacon_hazard', 'toolused_on_asistmod:block_beacon_hazard', 'toolused_on_end_bricks',
+        'toolused_on_stone', 'toolused_on_sand', 'toolused_on_log', 'toolused_on_stonebrick',
+        'toolused_on_asistmod:block_bomb_fire',	'toolused_on_asistmod:block_bomb_standard',
+        'toolused_on_asistmod:block_bomb_chained',	'toolused_on_block_bomb_chained', 'toolused_on_block_bomb_standard',
+        'objectstatechange_outcome_count_block_bomb_chained_PERTURBATION_FIRE_TRIGGER',
+        'objectstatechange_outcome_count_block_bomb_fire_PERTURBATION_FIRE_TRIGGER',
+        'objectstatechange_outcome_count_block_bomb_standard_PERTURBATION_FIRE_TRIGGER'
+    ] + columns_with_suffix + columns_with_prefix
+
+    # Including dynamically generated column names for uiclick and ITEMSTACK based on patterns
+    columns_to_remove += [col for col in df.columns if 'uiclick_element_id_' in col or 'uiclick_meta_action_count_' in col]
+    columns_to_remove += [col for col in df.columns if 'ITEMSTACK' in col]
+
+    remove_specified_columns(df, columns_to_remove)
+
+    # Save the modified DataFrame to a new CSV file
+    df.to_csv(output_filepath, index=False)
+
+
+def clean_and_save_csv(input_filepath, output_filepath):
+    # Load the post-processed CSV file into a DataFrame
+    df = pd.read_csv(input_filepath)
+
+    # Filter out rows based on 'Mission_State_Change_Outcome'
+    removal_conditions = [
+        '',  # Blank entries
+        'MISSION_STOP_SERVER_CRASHED',
+        'MISSION_STOP_PLAYER_LEFT',
+        'MISSION_STOP_CLIENTMAP_DISCONNECT',
+        'MISSION_STOP_MINECRAFT_DISCONNECT'
+    ]
+    df = df[~df['Mission_State_Change_Outcome'].isin(removal_conditions)]
+
+    # Further remove rows based on specified conditions
+    df = df[df['Max_Store_Visits_flocking'] <= 600]  # Condition a
+    df = df[df['team_budget_lowest'] >= -1]  # Condition b
+
+    # Save the cleaned DataFrame to a new CSV file
+    df.to_csv(output_filepath, index=False)
+
+
+def post_process_trial_summaries(trial_summary_profiled_file_path,
+                                 output_trial_summary_profiled_post_processed_file_path,
+                                 output_trial_summary_profiled_cleaned_file_path,
+                                 trial_level_team_profiles_file_path,
+                                 output_trial_summary_profiled_surveys_file_path
+                                 ):
+    # input_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled.csv'
+    # output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled_PostProcessed.csv'
+    process_csv(trial_summary_profiled_file_path, output_trial_summary_profiled_post_processed_file_path)
+
+    # cleaning_input_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled_PostProcessed.csv'
+    # cleaning_output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_cleaned.csv'
+    clean_and_save_csv(output_trial_summary_profiled_post_processed_file_path, output_trial_summary_profiled_cleaned_file_path)
+
+    # cleaned_df = pd.read_csv('C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_cleaned.csv')
+    cleaned_df = pd.read_csv(output_trial_summary_profiled_cleaned_file_path)
+    # team_profiles_surveys_df = pd.read_csv('C:\\Post-doc Work\\ASIST Study 4\\Study_4_trialLevel_TeamProfiles.csv')
+    team_profiles_surveys_df = pd.read_csv(trial_level_team_profiles_file_path)
+    merged_df = pd.merge(cleaned_df, team_profiles_surveys_df, on='trial_id', how='inner')
+    # merging_output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_Surveys.csv'
+
+    # Save the merged DataFrame to a new CSV file
+    merged_df.to_csv(output_trial_summary_profiled_surveys_file_path, index=False)
