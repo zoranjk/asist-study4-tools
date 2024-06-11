@@ -1353,3 +1353,184 @@ def post_process_trial_summaries(trial_summary_profiled_file_path,
 
     # Save the merged DataFrame to a new CSV file
     merged_df.to_csv(output_trial_summary_profiled_surveys_file_path, index=False)
+
+
+#####################################
+# functions for splitting time series
+#####################################
+
+def split_time_series(processed_time_series_cleaned_profiled_dir_path,
+                      output_player_state_items_objects_dir_path,
+                      output_player_state_flocking_dir_path,
+                      output_flocking_dir_path,
+                      output_team_behaviors_asi_flocking_dir_path,
+                      output_team_behaviors_flocking_dir_path,
+                      output_team_behaviors_asi_dir_path):
+    # Define the input folder
+    # input_folder = 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_CSVs_Cleaned_Profiled'
+
+    # Secondary columns that must be retained if primary columns have data
+    secondary_columns = [
+        "elapsed_milliseconds_stage", "timestamp", "experiment_id", "elapsed_milliseconds_global",
+        "trial_id", "timestamp_numeric", "participant_id", "estimated_elapsed_ms" , "player_teamwork_potential_score",
+        "player_taskwork_potential_score",	"player_teamwork_potential_category",
+        "player_taskwork_potential_category_liberal",	"player_taskwork_potential_category_conservative",
+        "team_teamwork_potential_score",	"team_teamwork_potential_category",	"team_taskwork_potential_score_liberal",
+        "team_taskwork_potential_category_liberal",	"team_taskwork_potential_score_conservative",
+        "team_taskwork_potential_category_conservative", 'geometric_alignment_allAttributes',
+        'physical_alignment_allAttributes', 'algebraic_alignment_allAttributes',
+        'centroid_physical_alignment_allAttributes', 'geometric_alignment_teamworkAttributes',
+        'physical_alignment_teamworkAttributes', 'algebraic_alignment_teamworkAttributes',
+        'centroid_physical_alignment_teamworkAttributes', 'geometric_alignment_taskworkAttributes',
+        'physical_alignment_taskworkAttributes', 'algebraic_alignment_taskworkAttributes',
+        'centroid_physical_alignment_taskworkAttributes']
+
+    # Define configurations for each set of primary columns and their output directories and suffixes
+    configurations = [
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\PlayerState_ItemsObjects',
+            "output_folder": output_player_state_items_objects_dir_path,
+            "primary_columns": [
+                "playerstatechanged_ppe_equipped", "playerstatechanged_player_z", "playerstatechanged_source_z",
+                "playerstatechanged_is_frozen", "player_state_x", "playerstatechanged_source_x", "itemused_target_x",
+                "toolused_target_block_y", "objectstatechange_outcome", "player_state_y", "playerstatechanged_health",
+                "player_state_z", "player_state_pitch", "itemused_target_y", "playerstatechanged_player_y",
+                "objectstatechange_triggering_entity", "player_state_yaw", "playerstatechanged_source_y",
+                "objectstatechange_id",
+                "playerstatechanged_changedattributes", "sprinting", "itemused_item_name", "objectstatechange_y",
+                "objectstatechange_x", "playerstatechanged_source_type", "playerstatechanged_source_id",
+                "itemused_target_z",
+                "objectstatechange_sequence", "itemused_item_id", "playerstatechanged_player_x", "objectstatechange_type"
+            ],
+            "suffix": "_PlayerState_ItemsObjects.csv"
+        },
+
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\PlayerState_Flocking',
+            "output_folder": output_player_state_flocking_dir_path,
+            "primary_columns": [
+                "player_state_x", "player_state_y", "player_state_z", "player_state_pitch", "player_state_yaw",
+                "sprinting", "flocking_alignment", "flocking_separation", "flocking_phase", "flocking_td",
+                "flocking_period",
+                "flocking_cohesion"
+            ],
+            "suffix": "_PlayerState_Flocking.csv"
+        },
+
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\Flocking',
+            "output_folder": output_flocking_dir_path,
+            "primary_columns": [
+                "flocking_alignment", "flocking_separation", "flocking_phase", "flocking_td",
+                "flocking_period",
+                "flocking_cohesion"
+            ],
+            "suffix": "_Flocking.csv"
+        },
+
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\TeamBehaviors_ASI_Flocking',
+            "output_folder": output_team_behaviors_asi_flocking_dir_path,
+            "primary_columns": [
+                "flocking_alignment", "flocking_separation", "flocking_phase", "flocking_td",
+                "flocking_period", "flocking_cohesion",
+                "objectstatechange_outcome", "toolused_tool_type", "playerstatechanged_health",
+                "playerstatechanged_ppe_equipped", "playerstatechanged_is_frozen", "chat_text", "communicationchat_message",
+                "communicationenvironment_message", "uiclick_meta_action", "communicationenvironment_sender_type",
+                "communicationchat_environment", "interventionchat_b_content", "communicationenvironment_recipients",
+                "interventionchat_content", "interventionchat_receivers", "objectstatechange_triggering_entity",
+                "communicationenvironment_sender_x", "communicationchat_message_id", "teamscore",
+                "interventionchat_b_receivers", "communicationchat_sender_id", "communicationenvironment_sender_y",
+                "objectstatechange_id", "playerstatechanged_changedattributes", "uiclick_element_id", "sprinting",
+                "itemused_item_name", "objectstatechange_y", "objectstatechange_x", "playerstatechanged_source_type",
+                "playerstatechanged_source_id", "interventionresponse_agent_id", "communicationchat_source",
+                "communicationenvironment_source", "interventionchat_id", "objectstatechange_sequence", "itemused_item_id",
+                "interventionresponse_response_index", "playerstatechanged_player_x", "communicationenvironment_message_id",
+                "objectstatechange_type", "interventionchat_b_response_options", "team_budget", "state_change_outcome",
+
+
+            ],
+            "suffix": "_TeamBehaviors_ASI_Flocking.csv"
+        },
+
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\TeamBehaviors_Flocking',
+            "output_folder": output_team_behaviors_flocking_dir_path,
+            "primary_columns": [
+                "flocking_alignment", "flocking_separation", "flocking_phase", "flocking_td",
+                "flocking_period", "flocking_cohesion", "participant_id", "overlap", "nonoverlap", "straightline_distance",
+                "incremental_distance", "stationary_time", "ratio",
+                                                        
+                "objectstatechange_outcome", "toolused_tool_type", "playerstatechanged_health",
+                "playerstatechanged_ppe_equipped", "playerstatechanged_is_frozen", "chat_text", "communicationchat_message",
+                "communicationenvironment_message", "uiclick_meta_action", "communicationenvironment_sender_type",
+                "communicationchat_environment", "communicationenvironment_recipients",
+                "objectstatechange_triggering_entity",
+                "communicationenvironment_sender_x", "communicationchat_message_id", "teamscore",
+                "communicationchat_sender_id", "communicationenvironment_sender_y",
+                "objectstatechange_id", "playerstatechanged_changedattributes", "uiclick_element_id", "sprinting",
+                "itemused_item_name", "objectstatechange_y", "objectstatechange_x", "playerstatechanged_source_type",
+                "playerstatechanged_source_id", "communicationchat_source",
+                "communicationenvironment_source", "objectstatechange_sequence", "itemused_item_id",
+                "playerstatechanged_player_x", "communicationenvironment_message_id",
+                "objectstatechange_type", "team_budget", "state_change_outcome",
+
+                "mission_stage", "transitions_to_shop", "transitions_to_field", "transitionstofield"
+            ],
+            "suffix": "_TeamBehaviors_Flocking.csv"
+        },
+
+        {
+            # "output_folder": 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_Split_DataSheets\\TeamBehaviors_ASI',
+            "output_folder": output_team_behaviors_asi_dir_path,
+            "primary_columns": [
+                "objectstatechange_outcome", "toolused_tool_type", "playerstatechanged_health",
+                "playerstatechanged_ppe_equipped", "playerstatechanged_is_frozen", "chat_text", "communicationchat_message",
+                "communicationenvironment_message", "uiclick_meta_action", "communicationenvironment_sender_type",
+                "communicationchat_environment", "interventionchat_b_content", "communicationenvironment_recipients",
+                "interventionchat_content", "interventionchat_receivers", "objectstatechange_triggering_entity",
+                "communicationenvironment_sender_x", "communicationchat_message_id", "teamscore",
+                "interventionchat_b_receivers", "communicationchat_sender_id", "communicationenvironment_sender_y",
+                "objectstatechange_id", "playerstatechanged_changedattributes", "uiclick_element_id", "sprinting",
+                "itemused_item_name", "objectstatechange_y", "objectstatechange_x", "playerstatechanged_source_type",
+                "playerstatechanged_source_id", "interventionresponse_agent_id", "communicationchat_source",
+                "communicationenvironment_source", "interventionchat_id", "objectstatechange_sequence", "itemused_item_id",
+                "interventionresponse_response_index", "playerstatechanged_player_x", "communicationenvironment_message_id",
+                "objectstatechange_type", "interventionchat_b_response_options", "team_budget", "state_change_outcome",
+                "teamscore", "playerscore"
+
+            ],
+            "suffix": "_TeamBehaviors_ASI.csv"
+        }
+
+    ]
+
+    # Iterate over all CSV files in the input folder
+    for file in tqdm(os.listdir(processed_time_series_cleaned_profiled_dir_path)):
+        if file.endswith(".csv"):
+            file_path = os.path.join(processed_time_series_cleaned_profiled_dir_path, file)
+            # Read the CSV file
+            df = pd.read_csv(file_path, low_memory=False)
+
+            for config in configurations:
+                output_folder, primary_columns, suffix = config['output_folder'], config['primary_columns'], config[
+                    'suffix']
+
+                # Make sure the output folder exists
+                os.makedirs(output_folder, exist_ok=True)
+
+                # Filter rows where any of the primary columns have data
+                filtered_df = df.dropna(subset=primary_columns, how='all')
+
+                # Include secondary columns explicitly
+                final_columns = primary_columns + [col for col in secondary_columns if col in filtered_df.columns]
+                final_df = filtered_df[final_columns]
+
+                # Generate output file name and path
+                output_file_name = file.replace('.csv', suffix)
+                output_file_path = os.path.join(output_folder, output_file_name)
+
+                # Save the filtered dataframe to a new CSV
+                final_df.to_csv(output_file_path, index=False)
+
+    # print("All files processed successfully.")

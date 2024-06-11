@@ -39,6 +39,13 @@ if __name__ == "__main__":
     trial_summary_profiled_post_processed_file_path = os.path.join(data_dir_path, "trial_summary_profiled_post_processed.csv")
     trial_summary_profiled_cleaned_file_path = os.path.join(data_dir_path, "trial_summary_profiled_cleaned.csv")
     trial_summary_profiled_surveys_file_path = os.path.join(data_dir_path, "trial_summary_profiled_surveys.csv")
+    processed_time_series_split_dir_path = os.path.join(data_dir_path, "processed_time_series_split")
+    player_state_items_objects_dir_path = os.path.join(processed_time_series_split_dir_path, "player_states_items_objects")
+    player_state_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "player_states_flocking")
+    flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "flocking")
+    team_behaviors_asi_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_asi_flocking")
+    team_behaviors_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_flocking")
+    team_behaviors_asi_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_asi")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -157,9 +164,18 @@ if __name__ == "__main__":
     # timeseries.collate_summaries(processed_trial_summary_dir_path,
     #                              trial_summary_profiled_file_path)
 
-    print("Post-processing trial summaries...")
-    timeseries.post_process_trial_summaries(trial_summary_profiled_file_path,
-                                            trial_summary_profiled_post_processed_file_path,
-                                            trial_summary_profiled_cleaned_file_path,
-                                            trial_level_team_profiles_file_path,
-                                            trial_summary_profiled_surveys_file_path)
+    # print("Post-processing trial summaries...")
+    # timeseries.post_process_trial_summaries(trial_summary_profiled_file_path,
+    #                                         trial_summary_profiled_post_processed_file_path,
+    #                                         trial_summary_profiled_cleaned_file_path,
+    #                                         trial_level_team_profiles_file_path,
+    #                                         trial_summary_profiled_surveys_file_path)
+
+    print("Splitting time series...")
+    timeseries.split_time_series(processed_time_series_cleaned_profiled_dir_path,
+                                 player_state_items_objects_dir_path,
+                                 player_state_flocking_dir_path,
+                                 flocking_dir_path,
+                                 team_behaviors_asi_flocking_dir_path,
+                                 team_behaviors_flocking_dir_path,
+                                 team_behaviors_asi_dir_path)
