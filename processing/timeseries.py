@@ -510,7 +510,7 @@ def pre_scan_for_fieldnames(folder_path):
             'player_z': 'PlayerStateChanged_player_z'
         }
     }
-    for filename in tqdm(os.listdir(folder_path), desc='Pre-scanning metadata for field names'):
+    for filename in tqdm(os.listdir(folder_path), desc='  Pre-scanning metadata for field names'):
         if filename.endswith('.metadata'):
             file_path = os.path.join(folder_path, filename)
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -1534,3 +1534,41 @@ def split_time_series(processed_time_series_cleaned_profiled_dir_path,
                 final_df.to_csv(output_file_path, index=False)
 
     # print("All files processed successfully.")
+
+
+##############################################
+# functions for splitting flocking time series
+##############################################
+
+def create_subfolders(base_path):
+    periods = ['10', '30', '60', '180']
+    for period in periods:
+        folder_path = os.path.join(base_path, f'Period_{period}')
+        os.makedirs(folder_path, exist_ok=True)
+
+def split_csv_files(base_path):
+    files = glob.glob(os.path.join(base_path, '*.csv'))
+    periods = ['10', '30', '60', '180']
+
+    # total_files = len(files)
+    # processed_files = 0
+
+    for file in tqdm(files, desc='  Splitting CSV files'):
+        df = pd.read_csv(file, low_memory=False)
+        filename = os.path.basename(file)
+        for period in periods:
+            # Retain all rows not related to flocking or related to the specific period
+            period_df = df[(df['flocking_period'].isna()) | (df['flocking_period'] == int(period))]
+            output_folder = os.path.join(base_path, f'Period_{period}')
+            output_file = os.path.join(output_folder, f'{os.path.splitext(filename)[0]}_Period_{period}.csv')
+            period_df.to_csv(output_file, index=False)
+
+        # processed_files += 1
+        # print(f'Status: {processed_files}/{total_files} files processed ({(processed_files / total_files) * 100:.2f}%)')
+
+
+def split_flocking_time_series(team_behaviors_flocking_dir_path):
+    # base_path = r'C:\Post-doc Work\ASIST Study 4\Processed_TimeSeries_Split_DataSheets\TeamBehaviors_Flocking'
+    create_subfolders(team_behaviors_flocking_dir_path)
+    split_csv_files(team_behaviors_flocking_dir_path)
+    # print("All files have been processed.")

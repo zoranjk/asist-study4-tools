@@ -171,11 +171,14 @@ if __name__ == "__main__":
     #                                         trial_level_team_profiles_file_path,
     #                                         trial_summary_profiled_surveys_file_path)
 
-    print("Splitting time series...")
-    timeseries.split_time_series(processed_time_series_cleaned_profiled_dir_path,
-                                 player_state_items_objects_dir_path,
-                                 player_state_flocking_dir_path,
-                                 flocking_dir_path,
-                                 team_behaviors_asi_flocking_dir_path,
-                                 team_behaviors_flocking_dir_path,
-                                 team_behaviors_asi_dir_path)
+    # print("Splitting time series...")
+    # timeseries.split_time_series(processed_time_series_cleaned_profiled_dir_path,
+    #                              player_state_items_objects_dir_path,
+    #                              player_state_flocking_dir_path,
+    #                              flocking_dir_path,
+    #                              team_behaviors_asi_flocking_dir_path,
+    #                              team_behaviors_flocking_dir_path,
+    #                              team_behaviors_asi_dir_path)
+    
+    print("Splitting flocking time series...")
+    timeseries.split_flocking_time_series(team_behaviors_flocking_dir_path)
