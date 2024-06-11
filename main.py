@@ -35,6 +35,7 @@ if __name__ == "__main__":
     processed_time_series_cleaned_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned")
     processed_time_series_cleaned_profiled_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned_profiled")
     processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
+    trial_summary_profiled_file_path = os.path.join(data_dir_path, "trial_summary_profiled.csv")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     # team.write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial_measures_combined_file_path,
     #                                                        teams_trial_summary_profiles_surveys_file_path)
     
-    # print("Writing teams trials summary_profiles_survey_scores_repeats...")
+    # print("Writing teams trials summary profiles survey scores repeats...")
     # team.write_teams_trial_summary_profiles_survey_scores_repeats()
 
     # print("Integrating combined team trial measures into combined individual player profiles trial measures...")
@@ -145,6 +146,10 @@ if __name__ == "__main__":
     #                                        team_player_profiles_trial_measures_combined_file_path,
     #                                        processed_time_series_cleaned_profiled_dir_path)
 
-    print("Summarizing time series events...")
-    timeseries.summarize_events(processed_time_series_cleaned_profiled_dir_path,
-                                processed_trial_summary_dir_path)
+    # print("Summarizing time series events...")
+    # timeseries.summarize_events(processed_time_series_cleaned_profiled_dir_path,
+    #                             processed_trial_summary_dir_path)
+
+    print("Writing profiled trial summaries...")
+    timeseries.collate_summaries(processed_trial_summary_dir_path,
+                                 trial_summary_profiled_file_path)

@@ -5,6 +5,7 @@ import json
 import pandas as pd
 import csv
 from pathlib import Path
+import glob
 from tqdm import tqdm
 
 ##################################
@@ -1051,3 +1052,31 @@ def summarize_events(processed_time_series_cleaned_profiled_dir_path,
         summary_df.to_csv(output_filename, index=False)  # Save the DataFrame directly
         # print(f'Summary saved to {output_filename}')
 
+
+################################
+# functions to collate summaries
+################################
+
+def collate_summaries(processed_trial_summary_dir_path,
+                      output_file_path):
+    # Use glob to list all CSV files in the source directory
+    csv_files = glob.glob(os.path.join(processed_trial_summary_dir_path, "*.csv"))
+
+    # Initialize an empty list to store dataframes
+    df_list = []
+
+    # Loop through the list of csv files
+    for csv_file in csv_files:
+        # Read the current CSV file and append it to the list
+        df = pd.read_csv(csv_file)
+        df_list.append(df)
+
+    # Concatenate all dataframes in the list into one
+    combined_df = pd.concat(df_list, ignore_index=True)
+
+    # Save the combined dataframe to a new CSV file
+    combined_df.to_csv(output_file_path, index=False)
+
+    # print(f'Combined CSV saved to: {output_file_path}')
+
+    
