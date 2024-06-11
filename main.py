@@ -180,5 +180,8 @@ if __name__ == "__main__":
     #                              team_behaviors_flocking_dir_path,
     #                              team_behaviors_asi_dir_path)
     
-    print("Splitting flocking time series...")
-    timeseries.split_flocking_time_series(team_behaviors_flocking_dir_path)
+    # print("Splitting flocking time series...")
+    # timeseries.split_flocking_time_series(team_behaviors_flocking_dir_path)
+
+    print("Writing removed store time...")
+    timeseries.write_store_time_removed(team_behaviors_flocking_dir_path)

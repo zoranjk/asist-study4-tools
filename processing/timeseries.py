@@ -6,6 +6,7 @@ import pandas as pd
 import csv
 from pathlib import Path
 import glob
+import hashlib
 from tqdm import tqdm
 
 ##################################
@@ -1572,3 +1573,65 @@ def split_flocking_time_series(team_behaviors_flocking_dir_path):
     create_subfolders(team_behaviors_flocking_dir_path)
     split_csv_files(team_behaviors_flocking_dir_path)
     # print("All files have been processed.")
+
+
+###################################
+# functions for removing store time
+###################################
+
+
+def remove_store_time(df):
+    """Remove rows where the mission stage is 'STORE_STAGE'."""
+    # Fill forward the mission_stage values to propagate 'STORE_STAGE' and 'FIELD_STAGE' across the rows
+    df['mission_stage_filled'] = df['mission_stage'].ffill()
+
+    # Filter out rows that are in the 'STORE_STAGE'
+    df_filtered = df[df['mission_stage_filled'] != 'STORE_STAGE']
+
+    # Drop the helper column
+    df_filtered = df_filtered.drop(columns=['mission_stage_filled'])
+
+    return df_filtered
+
+
+def generate_short_filename(long_filename):
+    """Generate a short, unique filename using a hash."""
+    hash_object = hashlib.md5(long_filename.encode())
+    short_filename = hash_object.hexdigest() + '.csv'
+    return short_filename
+
+
+def write_store_time_removed(team_behaviors_flocking_dir_path):
+    # print('jere', type(team_behaviors_flocking_dir_path))
+    # Define input and output directories
+    input_dir = os.path.join(team_behaviors_flocking_dir_path, "Period_10")
+    # input_dir = r'C:\Post-doc Work\ASIST Study 4\Processed_TimeSeries_Split_DataSheets\TeamBehaviors_Flocking\Period_10'
+    output_dir_path = os.path.join(input_dir, 'StoreTimeRemoved')
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir_path, exist_ok=True)
+
+    # Process each CSV file in the input directory
+    for filename in tqdm(os.listdir(input_dir)):
+        if filename.endswith('.csv'):
+            # Read the CSV file
+            filepath = os.path.join(input_dir, filename)
+            try:
+                df = pd.read_csv(filepath, low_memory=False)
+            except Exception as e:
+                print(f"Error reading {filename}: {e}")
+                continue
+
+            # Remove store time rows
+            df_filtered = remove_store_time(df)
+
+            # Generate a short output filename
+            short_filename = generate_short_filename(filename)
+            output_filepath = os.path.join(output_dir_path, short_filename)
+
+            try:
+                df_filtered.to_csv(output_filepath, index=False)
+            except Exception as e:
+                print(f"Error saving {filename}: {e}")
+
+    # print("Processing complete. Filtered files are saved in 'StoreTimeRemoved' folder.")
