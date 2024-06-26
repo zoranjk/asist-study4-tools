@@ -1,4 +1,4 @@
-from processing import download, extract, dedup, etl, metadata, survey, team, timeseries
+from processing import download, extract, dedup, etl, metadata, survey, team, timeseries, analysis
 
 import json
 import os
@@ -28,17 +28,23 @@ if __name__ == "__main__":
     teams_alignment_results_combined_file_path = os.path.join(data_dir_path, "teams_alignment_results_combined.csv")
     trial_measures_team_combined_file_path = os.path.join(data_dir_path, "trial_measures_team_combined.csv")
     trial_level_team_profiles_file_path = os.path.join(data_dir_path, "trial_level_team_profiles.csv")
-    team_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "team_player_profiles_trial_measures_combined.csv")
+    teams_player_profiles_trial_measures_combined_file_path = os.path.join(data_dir_path, "teams_player_profiles_trial_measures_combined.csv")
     # TODO: this file path isn't necessary until i figure out those missing CSV files
-    # team_trials_summary_profiles_surveys_repeats_file_path = os.path.join(data_dir_path, "team_trials_summary_profiles_surveys_repeats.csv")
+    teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path = os.path.join(data_dir_path, "teams_trial_summary_profiles_surveys_repeats_for_analysis.csv")
+    trial_data_file_path = os.path.join(data_dir_path, "trial_data.csv")
+    teams_trial_summary_profiles_surveys_scores_repeats_for_analysis_file_path = os.path.join(data_dir_path, "teams_trial_summary_profiles_surveys_scores_repeats_for_analysis.csv")
+    
+    # Teams_TrialSummary_Profiles_Surveys_Scores_Repeats_ForAnalysis
+
+
     processed_time_series_dir_path = os.path.join(data_dir_path, "processed_time_series")
     processed_time_series_cleaned_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned")
-    processed_time_series_cleaned_profiled_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned_profiled")
+    processed_time_series_cleaned_profiles_dir_path = os.path.join(data_dir_path, "processed_time_series_cleaned_profiles")
     processed_trial_summary_dir_path = os.path.join(data_dir_path, "processed_trial_summary")
-    trial_summary_profiled_file_path = os.path.join(data_dir_path, "trial_summary_profiled.csv")
-    trial_summary_profiled_post_processed_file_path = os.path.join(data_dir_path, "trial_summary_profiled_post_processed.csv")
-    trial_summary_profiled_cleaned_file_path = os.path.join(data_dir_path, "trial_summary_profiled_cleaned.csv")
-    trial_summary_profiled_surveys_file_path = os.path.join(data_dir_path, "trial_summary_profiled_surveys.csv")
+    trial_summary_profiles_file_path = os.path.join(data_dir_path, "trial_summary_profiles.csv")
+    trial_summary_profiles_post_processed_file_path = os.path.join(data_dir_path, "trial_summary_profiles_post_processed.csv")
+    trial_summary_profiles_cleaned_file_path = os.path.join(data_dir_path, "trial_summary_profiles_cleaned.csv")
+    teams_trial_summary_profiles_surveys_file_path = os.path.join(data_dir_path, "teams_trial_summary_profiles_surveys.csv")
     processed_time_series_split_dir_path = os.path.join(data_dir_path, "processed_time_series_split")
     player_state_items_objects_dir_path = os.path.join(processed_time_series_split_dir_path, "player_states_items_objects")
     player_state_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "player_states_flocking")
@@ -46,6 +52,10 @@ if __name__ == "__main__":
     team_behaviors_asi_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_asi_flocking")
     team_behaviors_flocking_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_flocking")
     team_behaviors_asi_dir_path = os.path.join(processed_time_series_split_dir_path, "team_behaviors_asi")
+    individual_player_profiles_team_alignment_trial_measures_for_analysis_file_path = os.path.join(data_dir_path, "individual_player_profiles_team_alignment_trial_measures_for_analysis.csv")
+    analysis_dir_path = os.path.join(data_dir_path, "analysis")
+    individual_players_analysis_dir_path = os.path.join(analysis_dir_path, "individual_players")
+    player_profiles_anova_results_combined_analyses_file_path = os.path.join(individual_players_analysis_dir_path, "player_profiles_ANOVA_results_combined_analyses.docx")
 
     # print("Downloading dataset...")
     # download.download_dataverse_dataset(config['dataset']['persistent_id'],
@@ -129,14 +139,20 @@ if __name__ == "__main__":
     # print("Identifying repeat teams in combined team player profiles trial measures...")
     # team.identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path)
 
-    # # TODO: Figure out where to get Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv
-    # # for this and next function call.
-    # print("Writing teams trials summary profiles survey repeats...")
-    # team.write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial_measures_combined_file_path,
-    #                                                        teams_trial_summary_profiles_surveys_file_path)
-    
-    # print("Writing teams trials summary profiles survey scores repeats...")
-    # team.write_teams_trial_summary_profiles_survey_scores_repeats()
+    print("Writing teams trials summary profiles survey repeats...")
+    team.write_teams_trial_summary_profiles_survey_repeats(teams_player_profiles_trial_measures_combined_file_path,
+                                                           teams_trial_summary_profiles_surveys_file_path,
+                                                           teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path)
+
+    print("Writing trial data...")
+    team.write_trial_data(trial_measures_team_combined_file_path,
+                          teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path,
+                          trial_data_file_path)
+
+    print("Writing teams trials summary profiles survey scores repeats...")
+    team.write_teams_trial_summary_profiles_survey_scores_repeats(trial_data_file_path,
+                                                                  teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path,
+                                                                  teams_trial_summary_profiles_surveys_scores_repeats_for_analysis_file_path)
 
     # print("Integrating combined team trial measures into combined individual player profiles trial measures...")
     # team.integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
@@ -154,25 +170,25 @@ if __name__ == "__main__":
     # timeseries.add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
     #                                        individual_player_profiles_trial_measures_combined_file_path,
     #                                        team_player_profiles_trial_measures_combined_file_path,
-    #                                        processed_time_series_cleaned_profiled_dir_path)
+    #                                        processed_time_series_cleaned_profiles_dir_path)
 
     # print("Summarizing time series events...")
-    # timeseries.summarize_events(processed_time_series_cleaned_profiled_dir_path,
+    # timeseries.summarize_events(processed_time_series_cleaned_profiles_dir_path,
     #                             processed_trial_summary_dir_path)
 
-    # print("Writing profiled trial summaries...")
+    # print("Writing profiles trial summaries...")
     # timeseries.collate_summaries(processed_trial_summary_dir_path,
-    #                              trial_summary_profiled_file_path)
+    #                              trial_summary_profiles_file_path)
 
     # print("Post-processing trial summaries...")
-    # timeseries.post_process_trial_summaries(trial_summary_profiled_file_path,
-    #                                         trial_summary_profiled_post_processed_file_path,
-    #                                         trial_summary_profiled_cleaned_file_path,
+    # timeseries.post_process_trial_summaries(trial_summary_profiles_file_path,
+    #                                         trial_summary_profiles_post_processed_file_path,
+    #                                         trial_summary_profiles_cleaned_file_path,
     #                                         trial_level_team_profiles_file_path,
-    #                                         trial_summary_profiled_surveys_file_path)
+    #                                         teams_trial_summary_profiles_surveys_file_path)
 
     # print("Splitting time series...")
-    # timeseries.split_time_series(processed_time_series_cleaned_profiled_dir_path,
+    # timeseries.split_time_series(processed_time_series_cleaned_profiles_dir_path,
     #                              player_state_items_objects_dir_path,
     #                              player_state_flocking_dir_path,
     #                              flocking_dir_path,
@@ -183,5 +199,13 @@ if __name__ == "__main__":
     # print("Splitting flocking time series...")
     # timeseries.split_flocking_time_series(team_behaviors_flocking_dir_path)
 
-    print("Writing removed store time...")
-    timeseries.write_store_time_removed(team_behaviors_flocking_dir_path)
+    # print("Writing removed store time...")
+    # timeseries.write_store_time_removed(team_behaviors_flocking_dir_path)
+
+    # print("Renaming columns of some files for analysis...")
+    # analysis.rename
+
+    # print("Writing individual players analyses...")
+    # analysis.write_individual_analyses_anova(individual_player_profiles_team_alignment_trial_measures_for_analysis_file_path,
+    #                                          individual_players_analysis_dir_path,
+    #                                          player_profiles_anova_results_combined_analyses_file_path)

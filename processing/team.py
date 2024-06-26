@@ -329,25 +329,46 @@ def write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial
 
     # print(f"Merged file saved as {output_file}")
 
+def write_trial_data(trial_measures_team_combined_file_path,
+                     teams_trial_summary_profiles_surveys_for_analysis_file_path,
+                     output_file_path):
+    # Load the datasets
+    # file1_path = f'C:\\Post-doc Work\\ASIST Study 4\\Study_4_trial_measures_TeamCombined.csv'
+    # file2_path = f'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_Surveys_ForAnalysis.csv'
 
-def write_teams_trial_summary_profiles_surveys_scores_repeats():
+    df1 = pd.read_csv(trial_measures_team_combined_file_path)
+    df2 = pd.read_csv(teams_trial_summary_profiles_surveys_for_analysis_file_path)
+
+    # Merge the dataframes based on 'trial_id'
+    result = pd.merge(df2, df1[['trial_id','TeamScore']], on='trial_id', how='left', suffixes=(None, '_drop'))
+    result.drop(columns=[col for col in result.columns if col.endswith('_drop')], inplace=True)
+
+    # Save the merged dataframe to a new CSV file
+    # output_path = f'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Trial_Data_5-7-2024.csv'
+    result.to_csv(output_file_path, index=False)
+
+    # print(f"Merged data saved to {output_path}")
+
+def write_teams_trial_summary_profiles_survey_scores_repeats(trial_data_file_path,
+                                                             teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path,
+                                                             output_file_path):
     # File paths
-    file1 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Trial_Data_5-7-2024.csv'
-    file2 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv'
+    # file1 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Trial_Data_5-7-2024.csv'
+    # file2 = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Repeats_ForAnalysis.csv'
 
     # Read the CSV files
-    df1 = pd.read_csv(file1)
-    df2 = pd.read_csv(file2)
+    df1 = pd.read_csv(trial_data_file_path)
+    df2 = pd.read_csv(teams_trial_summary_profiles_surveys_repeats_for_analysis_file_path)
 
     # Select only the 'trial_id' and 'Team_Combination_Count' columns from the first dataframe
-    df1_selected = df1[['trial_id', 'Team_Score']]
+    df1_selected = df1[['trial_id', 'TeamScore']]
 
     # Merge the dataframes on 'trial_id'
     merged_df = pd.merge(df2, df1_selected, on='trial_id', how='left')
 
     # Save the merged dataframe to a new CSV file
-    output_file = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Scores_Repeats_ForAnalysis.csv'
-    merged_df.to_csv(output_file, index=False)
+    # output_file = r'C:\Post-doc Work\ASIST Study 4\Study_4_Teams_TrialSummary_Profiles_Surveys_Scores_Repeats_ForAnalysis.csv'
+    merged_df.to_csv(output_file_path, index=False)
 
 ##############################################################################
 # functions for post-hoc integrating individual player profiles trial measures
