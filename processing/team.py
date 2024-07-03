@@ -307,7 +307,7 @@ def identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path
 #################################################################
 
 def write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial_measures_combined_file_path,
-                                                      teams_trial_summary_profiles_surveys_file_path,
+                                                      teams_trial_summary_profiles_surveys_for_analysis_file_path,
                                                       output_file_path):
     # File paths
     # file1 = r'C:\Post-doc Work\ASIST Study 4\Study_4_team_playerProfiles_trialMeasures_Combined.csv'
@@ -315,7 +315,7 @@ def write_teams_trial_summary_profiles_survey_repeats(team_player_profiles_trial
 
     # Read the CSV files
     df1 = pd.read_csv(team_player_profiles_trial_measures_combined_file_path)
-    df2 = pd.read_csv(teams_trial_summary_profiles_surveys_file_path)
+    df2 = pd.read_csv(teams_trial_summary_profiles_surveys_for_analysis_file_path)
 
     # Select only the 'trial_id' and 'Team_Combination_Count' columns from the first dataframe
     df1_selected = df1[['trial_id', 'Team_Combination_Count']]
