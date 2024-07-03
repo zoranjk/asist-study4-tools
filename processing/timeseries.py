@@ -1331,29 +1331,29 @@ def clean_and_save_csv(input_filepath, output_filepath):
     df.to_csv(output_filepath, index=False)
 
 
-def post_process_trial_summaries(trial_summary_profiled_file_path,
-                                 output_trial_summary_profiled_post_processed_file_path,
-                                 output_trial_summary_profiled_cleaned_file_path,
+def post_process_trial_summaries(trial_summary_profiles_file_path,
+                                 output_trial_summary_profiles_post_processed_file_path,
+                                 output_trial_summary_profiles_cleaned_file_path,
                                  trial_level_team_profiles_file_path,
-                                 output_trial_summary_profiled_surveys_file_path
+                                 output_trial_summary_profiles_surveys_file_path
                                  ):
     # input_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled.csv'
     # output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled_PostProcessed.csv'
-    process_csv(trial_summary_profiled_file_path, output_trial_summary_profiled_post_processed_file_path)
+    process_csv(trial_summary_profiles_file_path, output_trial_summary_profiles_post_processed_file_path)
 
     # cleaning_input_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled_PostProcessed.csv'
     # cleaning_output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_cleaned.csv'
-    clean_and_save_csv(output_trial_summary_profiled_post_processed_file_path, output_trial_summary_profiled_cleaned_file_path)
+    clean_and_save_csv(output_trial_summary_profiles_post_processed_file_path, output_trial_summary_profiles_cleaned_file_path)
 
     # cleaned_df = pd.read_csv('C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_cleaned.csv')
-    cleaned_df = pd.read_csv(output_trial_summary_profiled_cleaned_file_path)
+    cleaned_df = pd.read_csv(output_trial_summary_profiles_cleaned_file_path)
     # team_profiles_surveys_df = pd.read_csv('C:\\Post-doc Work\\ASIST Study 4\\Study_4_trialLevel_TeamProfiles.csv')
     team_profiles_surveys_df = pd.read_csv(trial_level_team_profiles_file_path)
     merged_df = pd.merge(cleaned_df, team_profiles_surveys_df, on='trial_id', how='inner')
     # merging_output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_Teams_TrialSummary_Profiles_Surveys.csv'
 
     # Save the merged DataFrame to a new CSV file
-    merged_df.to_csv(output_trial_summary_profiled_surveys_file_path, index=False)
+    merged_df.to_csv(output_trial_summary_profiles_surveys_file_path, index=False)
 
 
 #####################################
