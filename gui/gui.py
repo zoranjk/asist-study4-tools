@@ -1,19 +1,13 @@
 ''' module for GUI '''
-from processing import download, extract, dedup, etl
-from .console_capture import RedirectStdout
-
+from processing import download, process
 import json
-import sys
-import os
 import tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext
+from tkinter import filedialog, messagebox
 from pathlib import Path
 
 # load config
 with open("config/config.json") as config_file:
     config = json.load(config_file)
-dir_paths = config["dir_path"]
-file_paths = config["file_path"]
 
 # GUI functions
 def select_dir_path(data_dir_text):
@@ -43,21 +37,6 @@ def confirm_dl(dl_dir_text:tk.StringVar):
     if confirmed and is_valid_path(dl_dir_text):
         dl_dataset(strvar_to_path(dl_dir_text))
 
-def process_metadata(dl_dir_text, data_dir_text):
-    dl_dir_path = strvar_to_path(dl_dir_text)
-    data_dir_path = strvar_to_path(data_dir_text)
-    metadata_dir_path = os.path.join(data_dir_path, dir_paths["metadata"])
-    metadata_unique_dir_path = os.path.join(data_dir_path, dir_paths["metadata_unique"])
-
-    extract.extract_metadata(dl_dir_path, metadata_dir_path)
-    dedup.save_unique_files(metadata_dir_path, metadata_unique_dir_path)
-
-def process_unique_message_subtypes():
-    pass
-
-def process_intervention_measures():
-    pass
-
 def gui():
     ''' main function that runs the GUI '''
     root = tk.Tk()
@@ -72,7 +51,7 @@ def gui():
     dl_loc_entry = tk.Entry(dl_frame, textvariable=dl_dir_text, width=50)
     dl_loc_entry.pack(side=tk.LEFT, padx=10)
     dl_loc_button = tk.Button(dl_frame,
-                              text="Select a directory location",
+                              text="Select dataset directory location",
                               command=lambda: select_dir_path(dl_dir_text))
     dl_loc_button.pack(side=tk.LEFT)
 
@@ -93,27 +72,20 @@ def gui():
     an_entry = tk.Entry(an_frame, textvariable=data_dir_text, width=50)
     an_entry.pack(side=tk.LEFT, padx=10)
     an_button = tk.Button(an_frame,
-                          text="Select a directory location",
+                          text="Select analysis directory location",
                           command=lambda: select_dir_path(data_dir_text))
     an_button.pack(side=tk.LEFT)
 
 
-    # metadata
-    metadata_frame = tk.Frame(root)
-    metadata_frame.pack(padx=10, pady=10)
-    metadata_button = tk.Button(metadata_frame,
-                                text="Process metadata files",
-                                command=lambda: process_metadata(dl_dir_text,
-                                                                 data_dir_text))
-    metadata_button.pack(side=tk.LEFT)
+    # process data
+    processing_frame = tk.Frame(root)
+    processing_frame.pack(padx=10, pady=10)
+    processing_button = tk.Button(processing_frame,
+                                  text="Process files",
+                                  command=lambda: process.process(dl_dir_text,
+                                                                  data_dir_text))
+    processing_button.pack(side=tk.LEFT)
     
-
-
-
-    # # TODO: test remove this
-    # button = tk.Button(root, text="Print to Console", command=lambda: print("al;skdfjal;skdf"))
-    # button.pack(pady=10)
-
 
     # exit button
     exit_button = tk.Button(root, text='Exit', width=10, command=root.destroy)
