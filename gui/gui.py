@@ -1,9 +1,11 @@
 ''' module for GUI '''
-from processing import download
+from processing import download, extract
+from .console_capture import RedirectStdout
 
 import json
+import sys
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, scrolledtext
 from pathlib import Path
 
 # load config
@@ -17,25 +19,36 @@ def select_dir_path(data_dir_text):
     if dir_path:
         data_dir_text.set(dir_path)
 
-def dl_dataset(dl_dir_text):
-    download.download_dataverse_dataset(config['dataset']['persistent_id'], Path(dl_dir_text.get()))
+def dl_dataset(dl_dir:Path):
+    download.download_dataverse_dataset(config['dataset']['persistent_id'], dl_dir)
 
-def confirm_dl(dl_dir_text):
-    confirmed = messagebox.askyesnocancel("Confirm download", "Are you sure you want to download the dataset? You may overwrite an existing download.")
-    if dl_dir_text.get() == '':
+def is_valid_path(text:tk.StringVar) -> bool:
+    ''' given a tk.StringVar converts it to a path and returns false if empty or invalid '''
+    if text.get() == '':
         messagebox.showerror("Missing directory", "Please select a directory location for the download and try again.")
-        return
-    if not Path(dl_dir_text.get()).is_dir():
+        return False
+    elif not Path(text.get()).is_dir():
         messagebox.showerror("Invalid directory", "Please select a valid directory location for the download and try again.")
-    elif confirmed:
-        dl_dataset(dl_dir_text)
+        return False
+    return True
+
+def get_path(text:tk.StringVar) -> Path:
+    return Path(text.get())
+
+def confirm_dl(dl_dir_text:tk.StringVar):
+    confirmed = messagebox.askyesnocancel("Confirm download", "Are you sure you want to download the dataset? You may overwrite an existing download.")
+    if confirmed and is_valid_path(dl_dir_text):
+        dl_dataset(get_path(dl_dir_text))
+
+def process_metadata(dl_dir_text):
+    extract.extract_metadata()
 
 
 def gui():
     ''' main function that runs the GUI '''
     root = tk.Tk()
     root.title('ASIST Study 4 Analysis Tools')
-
+    
     # dataset download location selection
     dl_frame = tk.Frame(root)
     dl_frame.pack(padx=10, pady=10)
@@ -63,6 +76,22 @@ def gui():
     an_entry.pack(side=tk.LEFT, padx=10)
     an_button = tk.Button(an_frame, text="Select a directory location", command=lambda: select_dir_path(an_dir_text))
     an_button.pack(side=tk.LEFT)
+
+
+    # metadata
+    # metadata_frame = tk.Frame(root)
+    # metadata_frame.pack(padx=10, pady=10)
+    # metadata_button = tk.Button(tk.Button(metadata_frame,
+    #                                       text="Process metadata files",
+    #                                       command=lambda: ))
+    
+
+
+
+    # TODO: test remove this
+    button = tk.Button(root, text="Print to Console", command=lambda: print("al;skdfjal;skdf"))
+    button.pack(pady=10)
+
 
     # exit button
     exit_button = tk.Button(root, text='Exit', width=10, command=root.destroy)
