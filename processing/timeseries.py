@@ -533,6 +533,7 @@ def pre_scan_for_fieldnames(folder_path):
 
 # extract_and_save_data function to use pre-scanned fieldnames
 def extract_and_write_time_series(metadata_unique_dir_path, processed_time_series_dir_path):
+    print("Processing time series messages...")
     os.makedirs(processed_time_series_dir_path, exist_ok=True)
     files = [f for f in os.listdir(metadata_unique_dir_path) if f.endswith('.metadata')]
     total_files = len(files)
@@ -623,6 +624,7 @@ def estimate_elapsed_milliseconds_and_convert_timestamp(df):
 
 def clean_time_series(processed_time_series_dir_path,
                       processed_time_series_cleaned_dir_path):
+    print("Cleaning time series messages...")
     os.makedirs(processed_time_series_cleaned_dir_path, exist_ok=True)
 
     # List of columns to remove
@@ -719,7 +721,7 @@ def add_profiles_to_time_series(processed_time_series_cleaned_dir_path,
                                 individual_player_profiles_trial_measures_combined_file_path,
                                 team_player_profiles_trial_measures_combined_file_path,
                                 output_dir_path):
-
+    print("Adding profiles to time series data...")
     # Ensure the output directory exists
     os.makedirs(output_dir_path, exist_ok=True)
 
@@ -1036,6 +1038,7 @@ def process_file(filepath):
 
 def summarize_events(processed_time_series_cleaned_profiled_dir_path,
                      output_dir_path):
+    print("Summarizing time series events...")
     # input_dir = Path('C:/Post-doc Work/ASIST Study 4/Processed_TimeSeries_CSVs_Cleaned_Profiled')
     # output_dir = Path('C:/Post-doc Work/ASIST Study 4/Processed_TrialSummary_Output_CSVs')
     # output_dir.mkdir(exist_ok=True)
@@ -1060,6 +1063,7 @@ def summarize_events(processed_time_series_cleaned_profiled_dir_path,
 
 def collate_summaries(processed_trial_summary_dir_path,
                       output_file_path):
+    print("Writing profiles trial summaries...")
     # Use glob to list all CSV files in the source directory
     csv_files = glob.glob(os.path.join(processed_trial_summary_dir_path, "*.csv"))
 
@@ -1337,6 +1341,7 @@ def post_process_trial_summaries(trial_summary_profiles_file_path,
                                  trial_level_team_profiles_file_path,
                                  output_trial_summary_profiles_surveys_file_path
                                  ):
+    print("Post-processing trial summaries...")
     # input_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled.csv'
     # output_filepath = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_TrialSummary_Profiled_PostProcessed.csv'
     process_csv(trial_summary_profiles_file_path, output_trial_summary_profiles_post_processed_file_path)
@@ -1367,6 +1372,7 @@ def split_time_series(processed_time_series_cleaned_profiled_dir_path,
                       output_team_behaviors_asi_flocking_dir_path,
                       output_team_behaviors_flocking_dir_path,
                       output_team_behaviors_asi_dir_path):
+    print("Splitting time series...")
     # Define the input folder
     # input_folder = 'C:\\Post-doc Work\\ASIST Study 4\\Processed_TimeSeries_CSVs_Cleaned_Profiled'
 
@@ -1569,6 +1575,7 @@ def split_csv_files(base_path):
 
 
 def split_flocking_time_series(team_behaviors_flocking_dir_path):
+    print("Splitting flocking time series...")
     # base_path = r'C:\Post-doc Work\ASIST Study 4\Processed_TimeSeries_Split_DataSheets\TeamBehaviors_Flocking'
     create_subfolders(team_behaviors_flocking_dir_path)
     split_csv_files(team_behaviors_flocking_dir_path)
@@ -1602,6 +1609,7 @@ def generate_short_filename(long_filename):
 
 
 def write_store_time_removed(team_behaviors_flocking_dir_path):
+    print("Writing removed store time...")
     # print('jere', type(team_behaviors_flocking_dir_path))
     # Define input and output directories
     input_dir = os.path.join(team_behaviors_flocking_dir_path, "Period_10")

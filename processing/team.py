@@ -9,6 +9,7 @@ from tqdm import tqdm
 #############################################
 
 def collate_team_trial_measures(processed_trial_summary_dir_path, output_file_path):
+    print("Collating team trial measures...")
     # List files in the directory
     files = os.listdir(processed_trial_summary_dir_path)
 
@@ -181,6 +182,7 @@ def calculate_additional_team_averages(df):
 
 def calculate_trial_level_team_profiles(individual_player_profiles_trial_measures_combined_file_path,
                                         output_file_path):
+    print("Calculating trial level team profiles...")
     # Load the dataset
     df = load_data(individual_player_profiles_trial_measures_combined_file_path)
 
@@ -234,6 +236,7 @@ def write_team_player_profiles_trial_measures_combined(trial_measures_team_combi
                                                        trial_level_team_profiles_file_path,
                                                        teams_alignment_results_combined_file_path,
                                                        output_file_path):
+    print("Writing combined team player profiles trial measures...")
     # Read in the files
     trial_measures = pd.read_csv(trial_measures_team_combined_file_path)
     trial_level_profiles = pd.read_csv(trial_level_team_profiles_file_path)
@@ -259,7 +262,7 @@ def write_team_player_profiles_trial_measures_combined(trial_measures_team_combi
 ####################################
 
 def identify_repeat_teams(team_player_profiles_trial_measures_combined_file_path):
-
+    print("Identifying repeat teams in combined team player profiles trial measures...")
     # Step 1: Read the CSV File
     # file_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_team_playerProfiles_trialMeasures_Combined.csv'
     df = pd.read_csv(team_player_profiles_trial_measures_combined_file_path)
@@ -376,6 +379,7 @@ def write_teams_trial_summary_profiles_survey_scores_repeats(trial_data_file_pat
 
 def integrate_individual_player_profiles_trial_measures_combined(trial_measures_team_combined_file_path,
                                                                  individual_player_profiles_trial_measures_combined_file_path):
+    print("Integrating combined team trial measures into combined individual player profiles trial measures...")
     # Paths to the CSV files
     # team_combined_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_trial_measures_TeamCombined.csv'
     # individual_profiles_path = 'C:\\Post-doc Work\\ASIST Study 4\\Study_4_individual_playerProfiles_trialMeasures_Combined.csv'

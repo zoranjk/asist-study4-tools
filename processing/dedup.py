@@ -36,6 +36,7 @@ def find_unique_files(folder_path):
 
 def save_unique_files(folder_path, output_folder):
     """Save unique files to the output folder."""
+    print("Deduplicating metadata...")
     os.makedirs(output_folder, exist_ok=True)
     unique_files = find_unique_files(folder_path)
 
