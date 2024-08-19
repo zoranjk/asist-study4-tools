@@ -1,0 +1,4 @@
+requests
+scipy
+tk
+tqdm
