@@ -48,6 +48,7 @@ def process_individual_measures(trial_id, individual_measures_path, destination_
 
 
 def extract_and_process_files(source_dir, destination_dir):
+    print("Processing individual surveys...")
     os.makedirs(destination_dir, exist_ok=True)
 
     for file in tqdm(os.listdir(source_dir)):
@@ -74,6 +75,7 @@ def extract_and_process_files(source_dir, destination_dir):
 #############################################
 
 def combine_individual_measures(individual_survey_dir_path, output_file_path):
+    print("Combining individual measures...")
     # List all CSV files in the directory
     csv_files = [file for file in os.listdir(individual_survey_dir_path) if file.endswith('_individual_measures.csv')]
 
@@ -98,6 +100,7 @@ def combine_individual_measures(individual_survey_dir_path, output_file_path):
 ##########################################
 
 def write_individual_measures_unique(individual_measures_combined_file_path, output_file_path):
+    print("Writing unique individual measures...")
     data = pd.read_csv(individual_measures_combined_file_path)
 
     # Initialize a list to hold the data for the new DataFrame
@@ -314,6 +317,7 @@ def track_individual_missing_data(df, columns):
 
 
 def write_individual_measures_calculated_unique(individual_measures_unique_file_path, output_file_path):
+    print("Writing calculated unique individual measures...")
     # Load the dataset and rename columns
     df = load_and_rename_columns(individual_measures_unique_file_path)
 
@@ -348,6 +352,7 @@ def write_individual_measures_calculated_unique(individual_measures_unique_file_
 ##########################################################
 
 def write_individual_trial_measures_combined(processed_trial_summary_dir_path, output_file_path):
+    print("Writing combined individual trial measures...")
     # List files in the directory
     files = os.listdir(processed_trial_summary_dir_path)
 
@@ -384,6 +389,7 @@ def write_individual_player_profile_trial_measures_combined(individual_measures_
                                                             individual_trial_measures_combined_file_path,
                                                             individual_measures_combined_file_path,
                                                             output_path):
+    print("Writing combined individual player profile trial measures...")
     # Read the CSV files
     individual_measures_df = pd.read_csv(individual_measures_calculated_unique_file_path)
     trial_measures_df = pd.read_csv(individual_trial_measures_combined_file_path)
@@ -432,6 +438,7 @@ def write_individual_player_profile_trial_measures_combined(individual_measures_
 #####################################
 
 def post_hoc_calculate(individual_player_profiles_trial_measures_combined_file_path):
+    print("Doing in-place post-hoc calculations on combined individual player profile trial measures...")
     # Load the dataset
     df = pd.read_csv(individual_player_profiles_trial_measures_combined_file_path)
 
@@ -574,6 +581,7 @@ def calculate_alignment(df, attribute_columns, grouping_variable):
 
 
 def align_individual_player_profiles_trial_measures_combined(file_path, output_file_path, grouping_variable='trial_id'):
+    print("Writing combined team alignment results...")
     df = read_csv(file_path)
     df = preprocess_df(df)
     # Define attribute sets

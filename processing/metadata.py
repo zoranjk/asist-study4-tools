@@ -82,6 +82,7 @@ def extract_trial_summary_data(json_obj):
 
 
 def process_metadata_files(metadata_dir_path, output_folder_path):
+    print("Processing metadata files...")
     output_folder_path = Path(output_folder_path)
     output_folder_path.mkdir(parents=True, exist_ok=True)
     metadata_files = list(Path(metadata_dir_path).glob('*.metadata'))

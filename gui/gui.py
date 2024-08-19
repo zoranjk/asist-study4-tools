@@ -1,9 +1,10 @@
 ''' module for GUI '''
-from processing import download, extract
+from processing import download, extract, dedup, etl
 from .console_capture import RedirectStdout
 
 import json
 import sys
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 from pathlib import Path
@@ -11,6 +12,8 @@ from pathlib import Path
 # load config
 with open("config/config.json") as config_file:
     config = json.load(config_file)
+dir_paths = config["dir_path"]
+file_paths = config["file_path"]
 
 # GUI functions
 def select_dir_path(data_dir_text):
@@ -32,17 +35,28 @@ def is_valid_path(text:tk.StringVar) -> bool:
         return False
     return True
 
-def get_path(text:tk.StringVar) -> Path:
+def strvar_to_path(text:tk.StringVar) -> Path:
     return Path(text.get())
 
 def confirm_dl(dl_dir_text:tk.StringVar):
     confirmed = messagebox.askyesnocancel("Confirm download", "Are you sure you want to download the dataset? You may overwrite an existing download.")
     if confirmed and is_valid_path(dl_dir_text):
-        dl_dataset(get_path(dl_dir_text))
+        dl_dataset(strvar_to_path(dl_dir_text))
 
-def process_metadata(dl_dir_text):
-    extract.extract_metadata()
+def process_metadata(dl_dir_text, data_dir_text):
+    dl_dir_path = strvar_to_path(dl_dir_text)
+    data_dir_path = strvar_to_path(data_dir_text)
+    metadata_dir_path = os.path.join(data_dir_path, dir_paths["metadata"])
+    metadata_unique_dir_path = os.path.join(data_dir_path, dir_paths["metadata_unique"])
 
+    extract.extract_metadata(dl_dir_path, metadata_dir_path)
+    dedup.save_unique_files(metadata_dir_path, metadata_unique_dir_path)
+
+def process_unique_message_subtypes():
+    pass
+
+def process_intervention_measures():
+    pass
 
 def gui():
     ''' main function that runs the GUI '''
@@ -57,40 +71,48 @@ def gui():
     dl_loc_label.pack(side=tk.LEFT, padx=10)
     dl_loc_entry = tk.Entry(dl_frame, textvariable=dl_dir_text, width=50)
     dl_loc_entry.pack(side=tk.LEFT, padx=10)
-    dl_loc_button = tk.Button(dl_frame, text="Select a directory location", command=lambda: select_dir_path(dl_dir_text))
+    dl_loc_button = tk.Button(dl_frame,
+                              text="Select a directory location",
+                              command=lambda: select_dir_path(dl_dir_text))
     dl_loc_button.pack(side=tk.LEFT)
 
     
     # download dataset button
-    dl_button = tk.Button(dl_frame, text="Download dataset", command=lambda: confirm_dl(dl_dir_text))
+    dl_button = tk.Button(dl_frame,
+                          text="Download dataset",
+                          command=lambda: confirm_dl(dl_dir_text))
     dl_button.pack(side=tk.RIGHT, padx=10)
 
 
     # analysis directory selection
     an_frame = tk.Frame(root)
     an_frame.pack(padx=10, pady=10)
-    an_dir_text = tk.StringVar()
+    data_dir_text = tk.StringVar()
     an_label = tk.Label(an_frame, text='Analysis files output directory:')
     an_label.pack(side=tk.LEFT, padx=10)
-    an_entry = tk.Entry(an_frame, textvariable=an_dir_text, width=50)
+    an_entry = tk.Entry(an_frame, textvariable=data_dir_text, width=50)
     an_entry.pack(side=tk.LEFT, padx=10)
-    an_button = tk.Button(an_frame, text="Select a directory location", command=lambda: select_dir_path(an_dir_text))
+    an_button = tk.Button(an_frame,
+                          text="Select a directory location",
+                          command=lambda: select_dir_path(data_dir_text))
     an_button.pack(side=tk.LEFT)
 
 
     # metadata
-    # metadata_frame = tk.Frame(root)
-    # metadata_frame.pack(padx=10, pady=10)
-    # metadata_button = tk.Button(tk.Button(metadata_frame,
-    #                                       text="Process metadata files",
-    #                                       command=lambda: ))
+    metadata_frame = tk.Frame(root)
+    metadata_frame.pack(padx=10, pady=10)
+    metadata_button = tk.Button(metadata_frame,
+                                text="Process metadata files",
+                                command=lambda: process_metadata(dl_dir_text,
+                                                                 data_dir_text))
+    metadata_button.pack(side=tk.LEFT)
     
 
 
 
-    # TODO: test remove this
-    button = tk.Button(root, text="Print to Console", command=lambda: print("al;skdfjal;skdf"))
-    button.pack(pady=10)
+    # # TODO: test remove this
+    # button = tk.Button(root, text="Print to Console", command=lambda: print("al;skdfjal;skdf"))
+    # button.pack(pady=10)
 
 
     # exit button

@@ -34,6 +34,7 @@ def extract_unique_subtypes_with_examples(folder_path):
 
 def write_subtypes_to_csv(folder_path, output_file):
     # Write the unique subtypes and their example messages to a CSV file
+    print("Writing unique message subtype to file...")
     unique_subtypes_with_examples = extract_unique_subtypes_with_examples(folder_path)
 
     with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
@@ -44,6 +45,7 @@ def write_subtypes_to_csv(folder_path, output_file):
 
 
 def extract_and_rename_csv_files(source_dir, destination_dir):
+    print("Writing intervention measures CSVs...")
     os.makedirs(destination_dir, exist_ok=True)
 
     for file in tqdm(os.listdir(source_dir)):
@@ -66,6 +68,7 @@ def extract_and_rename_csv_files(source_dir, destination_dir):
 
 
 def write_intervention_measures_content(directory_path, output_path):
+    print("Writing intervention measures content CSV...")
     # Placeholder for content entries and their associated information
     entries = []
 
@@ -107,6 +110,7 @@ def write_intervention_measures_content(directory_path, output_path):
 
 
 def write_intervention_measures_content_unique(directory_path, output_path):
+    print("Deduplicating intervention measures content...")
     # Placeholder for unique content entries and their agents
     unique_entries = []
 

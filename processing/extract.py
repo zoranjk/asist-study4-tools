@@ -5,6 +5,7 @@ import zipfile
 from tqdm import tqdm
 
 def extract_metadata(zip_folder_path, output_path):
+    print("Extracting metadata files...")
     os.makedirs(output_path, exist_ok=True)
 
     for file_name in tqdm(os.listdir(zip_folder_path)):

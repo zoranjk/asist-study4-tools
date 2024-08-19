@@ -12,6 +12,7 @@ def download_file(url, file_name):
 
 
 def download_dataverse_dataset(persistent_id, output_path):
+    print("Downloading dataset...")
     url = f"https://dataverse.asu.edu/api/datasets/:persistentId/?persistentId=doi:10.48349/ASU/{persistent_id}"
 
     response = requests.get(url)
