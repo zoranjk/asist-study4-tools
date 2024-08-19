@@ -1,5 +1,19 @@
 {
     "dataset": {
         "persistent_id": "ZO6XVR"
+    },
+    "file_path": {
+        "message_subtypes_unique": "unique_message_subtypes_with_examples.csv",
+        "intervention_measures": "intervention_measures.csv",
+        "intervention_measures_unique": "intervention_measures_unique.csv",
+        "individual_measures_combined": "individual_measures_combined.csv",
+        "individual_measures_unique": "individual_measures_unique.csv"
+    },
+    "dir_path": {
+        "metadata": "metadata",
+        "metadata_unique": "metadata_unique",
+        "intervention_measures": "intervention_measures",
+        "processed_trial_summary": "processed_trial_summary",
+        "individual_surveys": "individual_surveys"
     }
 }
